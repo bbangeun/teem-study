@@ -31,6 +31,9 @@
   <p class="read-the-docs">
     팀스톤 화이팅
   </p>
+  <p class="read-the-docs">
+    Gibhub에서 변경
+  </p>
 </main>
 
 <style>
