@@ -12,10 +12,10 @@
       <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
     </a>
   </div>
-  <h1>Vite + Svelte</h1>
+  <h1>Vite + Svelte + TEEMSTONE</h1>
 
   <div class="card">
-    <Counter />
+    <Counter  />
   </div>
 
   <p>
@@ -24,6 +24,12 @@
 
   <p class="read-the-docs">
     Click on the Vite and Svelte logos to learn more
+  </p>
+  <p class="read-the-docs">
+    시작이 반이다.
+  </p>  
+  <p class="read-the-docs">
+    팀스톤 화이팅
   </p>
 </main>
 
