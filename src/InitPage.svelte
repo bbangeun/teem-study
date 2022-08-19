@@ -9,17 +9,12 @@ function onClickedLogin(){
 
 <div id="dv_Main">    
     <div id="dv_Sub">    
-        <label class="lb"> 아이디:</label>
-        <input class="edt" type="text"/>            
+        <label class="lb">아이디 : <input class="edt" type="text"/></label>                    
         <br/>
-        <label class="lb">비밀번호:</label>
-        <input class="edt" type="password"/>
+        <label class="lb">비밀번호 : <input class="edt" type="password"/></label>        
         <br/>
-        <label class="lb"></label>
-        <button id="btn_Login"type="button" on:click={onClickedLogin}>로그인</button>
-        <br/>        
-        <label class="lb"></label>
-        <label class="lb">{iInvaildCnt}</label>
+        <label class="lb"><button id="btn_Login"type="button" on:click={onClickedLogin}>로그인</button></label>       
+        <label class="lb" data-testid="counter-value">{iInvaildCnt}</label> 
     </div>
 </div>
 <style>
@@ -37,7 +32,7 @@ function onClickedLogin(){
         margin-top: 10px;        
         margin-right: 10px;        
         width: 100px;
-        display: inline-block;        
+        /* display: inline-block;         */
         justify-items: center;
         text-align: center;
         /*background-color: green;*/
