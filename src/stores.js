@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { writable } from 'svelte/store';
 
 export let unlockTiles = writable(false);
