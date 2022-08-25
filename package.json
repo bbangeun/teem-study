@@ -59,6 +59,7 @@
     "jest-transformer-svg": "^2.0.0",
     "svelte-jester": "^2.3.2",
     "svelte-routing": "^1.6.0",
+    "svelte-splitpanes": "^0.7.3",
     "ts-jest": "^28.0.8"
   }
 }
