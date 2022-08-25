@@ -1,4 +1,4 @@
-<script>
+<script>    
     import { unlockTiles, currentLayout } from './stores.js';
     import { tileTypes } from './layout.js';
     

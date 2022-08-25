@@ -1,3 +1,4 @@
+/* eslint-disable */
 import BlankTile from "./BlankTile.svelte";
 // import GridControl from "./GridControl.svelte";
 //add your components here

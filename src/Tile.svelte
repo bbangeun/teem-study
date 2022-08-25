@@ -1,4 +1,4 @@
-<script>
+<script>		
 	import { unlockTiles, showDrops, activeTile, dropTarget, dragOrigin } from './stores.js';
 	import { fade } from 'svelte/transition';
 	import { createEventDispatcher } from 'svelte';

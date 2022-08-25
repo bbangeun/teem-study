@@ -1,3 +1,4 @@
+/* eslint-disable */
 import './app.css'
 //import App from './Mosaic.svelte'
 import App from './App.svelte'
