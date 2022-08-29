@@ -3,25 +3,26 @@
     import Panel from "./Panel.svelte";
   
     const addPanel = (nodes, index) => {
-      console.log(nodes);
+      // console.log(nodes);
       counter += 1;
 
       console.log('counter: ' +counter);      
       
-      if (Object.keys(nodes).length == 1) { // 반으로 가르는건 push 
-        nodes.push(String(counter));
-      } 
+
+      if (Object.keys(nodes).length == 1) {
+        nodes.push(String(counter))
+      }       
       else if (counter == 3) {
         nodes[1] = {
           horizontal: true,
-          nodes: [String(counter-1), String(counter)]
-      };
+          nodes: [String(counter-1), String(counter)],
+        };
       }
       else if (counter % 2 == 0) { // 짝수 horizontal false 
-        splitPanel(mosaicData.nodes[1], false);
+        recursion(mosaicData.nodes[1], false);
       } 
-      else if (counter % 2 == 1) { // 홀수 horizontal true 
-        splitPanel(mosaicData.nodes[1], true);        
+      else if (counter % 2 == 1) { // 홀수 horizontal true         
+        recursion(mosaicData.nodes[1], true);        
       } 
       else {
         console.log('else: ' + counter); 
@@ -33,35 +34,56 @@
     };
   
     const deletePanel = (nodes, index) => {
-      console.log('delte index: ' + index);
-      counter -= 1;
-
+      
+      console.log(index);
       nodes.splice(index, 1);      
 
       mosaicData = mosaicData;
+
     };
 
-    const splitPanel = (node, horizontal) => {   
+    const recursion = (node, horizontal) => {   
 
-      let nodeA = String(counter-1);
+      let nodeA = String(counter - 1);
       let nodeB = String(counter);
 
       let splitNode = {
           horizontal: horizontal,
-          nodes: [nodeA, nodeB]
+          nodes: [nodeA, nodeB],
+          count: counter
       }
 
-      if (typeof node === "string") { // 
+      if (typeof node === "string") { // 3
         node = splitNode
       }
-      else if (typeof node.nodes[1] === "object") {
-        splitPanel(node.nodes[1], horizontal) // 재귀 
+      else if (typeof node.nodes[1] === "object") { // 4 이상 
+        recursion(node.nodes[1], horizontal) // 재귀 
       }
       else { // typeof node.nodes[1] === "string"
         node.nodes[1] = splitNode
       }
 
     };
+
+    const splitPanel = (nodes, index) => {
+
+      // let target = document.querySelector('')
+
+      counter+=1;
+
+      if (index >= 0 && typeof nodes[index] === "string") { 
+        // splice(추가할 인덱스, 0, '추가할내용');
+        nodes.splice(index+1, 0, String(counter))
+      } 
+      else if (typeof nodes[index] === "object") { 
+        //r
+      }
+      else {
+        // 
+      }
+
+      mosaicData = mosaicData;
+    }
 
     let mosaicData = {
       horizontal: false,
@@ -79,8 +101,10 @@
   </div>
   <Splitpanes class="default-theme" style="height: 100%">
     {#each mosaicData.nodes as node, index}
-      <Panel
+      <Panel        
         {node}
+        {index}
+        splitPanel = {() => splitPanel(mosaicData.nodes, index)}        
         deletePanel = {() => deletePanel(mosaicData.nodes, index)}
       />
     {/each}
