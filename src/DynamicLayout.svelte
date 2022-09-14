@@ -30,9 +30,6 @@
       }
     }
     </script>
-    
-    <br/>
-    
     <div>
         <div id="divContainer">
         </div>
@@ -41,25 +38,15 @@
             <button class="btnSide" type="button" on:click="{onClickedRefresh}">삭제</button>        
         </div> 
     </div>
-    <style>    
-        /*
-        html{
-            width: 100%;
-            height: 100%;
-        }
-        body{                  
-            width: 100%;
-            height: 500px;
-            background-color: aqua;        
-        }
-        */
+
+    <style>            
         div{      
             background-color: blue;
             display: block; 
-            position: relative;        
+            position: absolute;        
     
             width:  100%;
-            height: 800px;
+            height: 95%;
         }
         #divContainer{
             display: inline-block;
@@ -89,7 +76,7 @@
             position: relative;        
             left: 10px;        
             width:  calc( 100% - 10px * 2 );       
-            height: 5%;       ; 
+            height: 5%;       
             margin-top: 10px;
         }
     </style>

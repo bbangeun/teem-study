@@ -26,6 +26,8 @@ a:hover {
 
 body, html, #app {    
   height: 100%;
+  margin: 0px;
+  padding: 0px;
 }
 
 h1 {
@@ -45,7 +47,7 @@ h1 {
   padding: 2rem;
   */
   text-align: center;
-  
+  background-color: red;
 }
 
 button {

@@ -99,7 +99,7 @@
   <div>
     <button on:click={() => addPanel(mosaicData.nodes)}>+</button>
   </div>
-  <Splitpanes class="default-theme" style="height: 100%">
+  <Splitpanes class="default-theme" style="height: 95%">
     {#each mosaicData.nodes as node, index}
       <Panel        
         {node}
