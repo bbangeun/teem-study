@@ -1,33 +1,36 @@
 <script>
     import { writable } from 'svelte/store'
-    import Flexible from './FlexibleView.svelte'
+    import BoxView      from './BoxView.svelte'
+    import FlexibleView from './FlexibleView.svelte'
 
-    let LastObj
+    class ViewBox{
+      constructor(Index, PID, Type, Ratio, Cnt, Start, End){
+        this.Index = Index,
+        this.PID   = PID,
+        this.Type  = Type,
+        this.Title = this.Index.toString(),
+        this.Ratio = Ratio,
+        this.Count = 1,        
+        this.Start = Start,
+        this.End   = End;
+      }
+    }
 
-    let id = 0;
-    let ViewList = writable([] );
+    let NewViewBox;    
 
-    $ViewList.push({
-        Index : id++,
-        Type  : 'H',
-        Title : id.toString(),
-        Pos_x : 0,  
-        Pos_y : 0,
-        Ratio : 50
-    })
-      
-    $ViewList.push({
-        Index : id++,
-        Type  : 'H',
-        Title : id.toString(),
-        Pos_x : 0,  
-        Pos_y : 0,
-        Ratio : 50
-    })
+    let ID = 0;
+    let ViewList = writable([]);
+
+    NewViewBox =  new ViewBox(ID, 0, 'N', '20%', 1, -1, -1);
+    $ViewList.push(NewViewBox);
+
+    /*
+    NewViewBox =  new ViewBox(++ID, NewViewBox.Index, '', '70%', 1, -1);
+    $ViewList.push(NewViewBox);    
+    */
 
     $ViewList = $ViewList;
     console.log($ViewList);
-
 
     function onClickedAdd () {
       /*
@@ -51,10 +54,7 @@
       LastObj = newDiv
 
       Parent.appendChild(newDiv)
-      */
-
       
-
       $ViewList.push({
         Index : id,
         Type  : 'H',
@@ -66,6 +66,7 @@
 
       $ViewList = $ViewList;      
       id += 1;
+      */
     }
     function onClickedRefresh () {
       const Parent = document.getElementById('idContainer')
@@ -75,7 +76,7 @@
       }
     }
     </script>
-	
+
     <div class=divCanvas>
       <header class="hdTop">
         <button class="btnApply" type="button" on:click="{onClickedAdd}">추가</button> 
@@ -83,7 +84,10 @@
       </header>
       <div id="idContainer" class="divContainer">
         {#each $ViewList as V}
-          <Flexible ID ={V.Index} LType={V.type} ></Flexible>
+          {#if V.Index == 0}           
+           <!--<BoxView ID ={V.Index} LType={V.Type} Ratio={V.Ratio}></BoxView>-->
+            <FlexibleView View={V}/>
+          {/if}
         {/each}
       </div>
     </div>
