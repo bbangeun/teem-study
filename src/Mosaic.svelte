@@ -4,13 +4,12 @@
     import FlexibleView from './FlexibleView.svelte'
 
     class ViewBox{
-      constructor(Index, PID, Type, Ratio, Cnt, Start, End){
+      constructor(Index, PID, Type, Ratio, Start, End){
         this.Index = Index,
         this.PID   = PID,
         this.Type  = Type,
         this.Title = this.Index.toString(),
-        this.Ratio = Ratio,
-        this.Count = 1,        
+        this.Ratio = Ratio,        
         this.Start = Start,
         this.End   = End;
       }
@@ -21,8 +20,26 @@
     let ID = 0;
     let ViewList = writable([]);
 
-    NewViewBox =  new ViewBox(ID, 0, 'N', '20%', 1, -1, -1);
+  
+
+
+    NewViewBox =  new ViewBox(ID, -1, 'H', '100%', 1, 2);
+    $ViewList.push(NewViewBox);        
+
+    NewViewBox =  new ViewBox(1,  0, 'V', '50%', -1, -1);
     $ViewList.push(NewViewBox);
+
+    NewViewBox =  new ViewBox(2,  0, 'N', '50%', -1, -1);
+    $ViewList.push(NewViewBox);
+  
+
+    /*
+    NewViewBox =  new ViewBox(3,  1, 'N', '100%', -1, -1);
+    $ViewList.push(NewViewBox);        
+
+    NewViewBox =  new ViewBox(4,  1, 'N', '100%', -1, -1);
+    $ViewList.push(NewViewBox); 
+    */
 
     /*
     NewViewBox =  new ViewBox(++ID, NewViewBox.Index, '', '70%', 1, -1);
@@ -30,7 +47,9 @@
     */
 
     $ViewList = $ViewList;
+    console.log('===================================================');
     console.log($ViewList);
+    console.log('===================================================');
 
     function onClickedAdd () {
       /*
@@ -84,9 +103,9 @@
       </header>
       <div id="idContainer" class="divContainer">
         {#each $ViewList as V}
-          {#if V.Index == 0}           
+          {#if V.Index === 0}           
            <!--<BoxView ID ={V.Index} LType={V.Type} Ratio={V.Ratio}></BoxView>-->
-            <FlexibleView View={V}/>
+            <FlexibleView View={V} StartView={(($ViewList[1]))} EndView={($ViewList[2])} {ViewList}/>
           {/if}
         {/each}
       </div>

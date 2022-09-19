@@ -3,6 +3,10 @@
     export let  LType = '';    
     export let  Ratio;
 
+    console.log('******************************')
+    console.log('BoxView:{ID}')
+    console.log('******************************')
+
     function onClickedSplite(){        
     }
     function onClickedRemove(){    
@@ -10,7 +14,8 @@
 </script>
 
 <!--{#if LType === 'H'}-->
-    <div class=divCanvas style="width:{Ratio}">    
+    <!-- <div class=divCanvas style="width:{Ratio}">     -->
+    <div class=divCanvas >     
         <header class="hdTop">
             <button class="btnApply" type="button" on:click="{onClickedSplite}">분리</button> 
             <button class="btnApply" type="button" on:click="{onClickedRemove}">삭제</button>        
@@ -24,7 +29,7 @@
     .divCanvas{
         background-color: blue; 
         border:     5px solid red;
-        /*width:      100%;*/
+        width:      100%;
         height:     calc(100% - 10px);
         resize:     both;    
         overflow:   hidden;
