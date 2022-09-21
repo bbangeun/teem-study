@@ -4,14 +4,15 @@
     import FlexibleView from './FlexibleView.svelte'
 
     class ViewBox{
-      constructor(Index, PID, Type, Ratio, Start, End){
+      constructor(Index, PID, Type, HRatio, VRatio, V1, V2){
         this.Index = Index,
         this.PID   = PID,
         this.Type  = Type,
         this.Title = this.Index.toString(),
-        this.Ratio = Ratio,        
-        this.Start = Start,
-        this.End   = End;
+        this.HRatio = HRatio,        
+        this.VRatio = VRatio,        
+        this.V1   = V1,
+        this.V2   = V2;
       }
     }
 
@@ -20,26 +21,21 @@
     let ID = 0;
     let ViewList = writable([]);
 
-  
-
-
-    NewViewBox =  new ViewBox(ID, -1, 'H', '100%', 1, 2);
+    NewViewBox =  new ViewBox(ID, -1, 'column', '100%', '100%', 1, 2);
     $ViewList.push(NewViewBox);        
 
-    NewViewBox =  new ViewBox(1,  0, 'V', '50%', -1, -1);
+    NewViewBox =  new ViewBox(1,  0,  'column', '50%', '100%', 3, 4);
     $ViewList.push(NewViewBox);
 
-    NewViewBox =  new ViewBox(2,  0, 'N', '50%', -1, -1);
+    NewViewBox =  new ViewBox(2,  0,  'column', '50%', '100%', -1, -1);
     $ViewList.push(NewViewBox);
-  
-
-    /*
-    NewViewBox =  new ViewBox(3,  1, 'N', '100%', -1, -1);
+    
+    
+    NewViewBox =  new ViewBox(3,  1,  'N', '50%', '100%', -1, -1);
     $ViewList.push(NewViewBox);        
 
-    NewViewBox =  new ViewBox(4,  1, 'N', '100%', -1, -1);
-    $ViewList.push(NewViewBox); 
-    */
+    NewViewBox =  new ViewBox(4,  1,  'N', '50%', '100%', -1, -1);
+    $ViewList.push(NewViewBox);     
 
     /*
     NewViewBox =  new ViewBox(++ID, NewViewBox.Index, '', '70%', 1, -1);
@@ -104,10 +100,10 @@
       <div id="idContainer" class="divContainer">
         {#each $ViewList as V}
           {#if V.Index === 0}           
-           <!--<BoxView ID ={V.Index} LType={V.Type} Ratio={V.Ratio}></BoxView>-->
-            <FlexibleView View={V} StartView={(($ViewList[1]))} EndView={($ViewList[2])} {ViewList}/>
+            <!-- <FlexibleView View={V} StartView={(($ViewList[1]))} EndView={($ViewList[2])} {ViewList}/> -->
+            <FlexibleView View={V} {ViewList}/>
           {/if}
-        {/each}
+        {/each} 
       </div>
     </div>
 
@@ -142,8 +138,9 @@
         margin:  0px;
         padding: 0px;
 
+        
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
 
       }
       .btnApply{            
