@@ -4,7 +4,7 @@
     import FlexibleView from './FlexibleView.svelte'
 
     class ViewBox{
-      constructor(Index, PID, Type, HRatio, VRatio, V1, V2){
+      constructor(Index, PID, Type, HRatio, VRatio, V1, V2, Offset){
         this.Index = Index,
         this.PID   = PID,
         this.Type  = Type,
@@ -13,6 +13,10 @@
         this.VRatio = VRatio,        
         this.V1   = V1,
         this.V2   = V2;
+        this.HRealRatio = "calc({HRatio} - 10px)"        
+        this.VRealRatio = "calc({VRatio} - 10px)"  
+        this.Offset = (((V1 > 0) && (V2 > 0)) || (PID > 0)) ? '10px' : '0px';
+        this.Display = (this.Type === 'H') ? 'inline-flex' : 'Block';                  
       }
     }
 
@@ -21,21 +25,39 @@
     let ID = 0;
     let ViewList = writable([]);
 
-    NewViewBox =  new ViewBox(ID, -1, 'column', '100%', '100%', 1, 2);
+    NewViewBox =  new ViewBox(ID, -1, 'H', '100%', '100%', 1, 2, );
     $ViewList.push(NewViewBox);        
 
-    NewViewBox =  new ViewBox(1,  0,  'column', '50%', '100%', 3, 4);
+    NewViewBox =  new ViewBox(1,  0,  'H', '60%', '100%', 3, 4);
     $ViewList.push(NewViewBox);
 
-    NewViewBox =  new ViewBox(2,  0,  'column', '50%', '100%', -1, -1);
-    $ViewList.push(NewViewBox);
-    
+    NewViewBox =  new ViewBox(2,  0,  'V', '40%', '100%', 5, 6);
+    $ViewList.push(NewViewBox);    
     
     NewViewBox =  new ViewBox(3,  1,  'N', '50%', '100%', -1, -1);
     $ViewList.push(NewViewBox);        
 
     NewViewBox =  new ViewBox(4,  1,  'N', '50%', '100%', -1, -1);
+    $ViewList.push(NewViewBox);       
+      
+    NewViewBox =  new ViewBox(5,  2,  'H', '100%', '50%', 7, 8);
+    $ViewList.push(NewViewBox);        
+
+    NewViewBox =  new ViewBox(6,  2,  'V', '100%', '50%', 9, 10);
     $ViewList.push(NewViewBox);     
+
+    NewViewBox =  new ViewBox(7,  5,  'N', '50%', '100%', -1, -1);
+    $ViewList.push(NewViewBox);        
+
+    NewViewBox =  new ViewBox(8,  5,  'N', '50%', '100%', -1, -1);
+    $ViewList.push(NewViewBox);     
+
+    NewViewBox =  new ViewBox(9,  5,  'N', '100%', '50%', -1, -1);
+    $ViewList.push(NewViewBox);        
+
+    NewViewBox =  new ViewBox(10,  5,  'N', '100%', '50%', -1, -1);
+    $ViewList.push(NewViewBox);     
+    
 
     /*
     NewViewBox =  new ViewBox(++ID, NewViewBox.Index, '', '70%', 1, -1);
@@ -101,7 +123,7 @@
         {#each $ViewList as V}
           {#if V.Index === 0}           
             <!-- <FlexibleView View={V} StartView={(($ViewList[1]))} EndView={($ViewList[2])} {ViewList}/> -->
-            <FlexibleView View={V} {ViewList}/>
+            <FlexibleView View={V} {ViewList} Total_Width="100%" Total_Height="100%"/>
           {/if}
         {/each} 
       </div>
@@ -144,7 +166,7 @@
 
       }
       .btnApply{            
-        width:   100px;       
+        width:   80px;       
         height:  calc(100% -10px);       
         margin:  5px;
         cursor: pointer;

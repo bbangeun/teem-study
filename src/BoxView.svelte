@@ -16,9 +16,9 @@
 <!--{#if LType === 'H'}-->
     <!-- <div class=divCanvas style="width:{Ratio}">     -->
     <div class=divCanvas >     
-        <header class="hdTop">
+        <header class="hdTop">            
             <button class="btnApply" type="button" on:click="{onClickedSplite}">분리</button> 
-            <button class="btnApply" type="button" on:click="{onClickedRemove}">삭제</button>        
+            <button class="btnApply" type="button" on:click="{onClickedRemove}">삭제</button>         
         </header>       
         <div id="idContainer" class="divCContainer">{ID}</div>               
     </div>
@@ -29,7 +29,7 @@
     .divCanvas{
         background-color: blue; 
         border:     5px solid red;
-        width:      100%;
+        width:      calc(100% - 10px);
         height:     calc(100% - 10px);
         resize:     both;    
         overflow:   hidden;
@@ -74,6 +74,7 @@
     }
     */
     .btnApply{            
+        /* width:   200px; */
         width:   100px;       
         height:  calc(100% -10px);       
         margin:  5px;

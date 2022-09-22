@@ -8,6 +8,9 @@
 
     export let Child_V1 = {};
     export let Child_V2 = {};   
+
+    export let Total_Width  = '0%';
+    export let Total_Height = '0%';
     
     let V1_Width  = 0;
     let V1_Height = 0;
@@ -67,29 +70,66 @@
 </script>
 
 <!-- <div class=divCanvas style="left: 0px; top: 0px; width:{View.HRatio}; height:{View.VRatio}; " > -->
-<div class="divCanvas" style="width: calc({View.HRatio}); height:{View.VRatio};">    
-    {#if (View.V1 === -1) && (View.V2 === -1)}                
-        <BoxView ID ={View.Index}></BoxView>            
-    {:else if (View.V1 > 0) && (View.V2 > 0)} 
-        {#if ((Child_V1.Index > 0) && (Child_V2.Index > 0)) }         
-            <svelte:self View={Child_V1} {ViewList}></svelte:self>         
-            <div class = "divResize" style= "width: 10px; height:{Child_V1.VRatio}" ></div>
-            <!-- <div class=divResize style="left: 1000px; top: 0px;  width:10px; height: {View.VRatio}" >HELLO</div>         -->
-            <svelte:self View={Child_V2} {ViewList}></svelte:self> 
+
+    <!-- 부모 일경우 -->
+
+    <!-- 부모가 아닐 경우 -->
+    <div class="divCanvas" 
+         style= "width: {Total_Width}; height:{Total_Height}; display:{View.Display}">              
+         {#if      View.Type === 'H'}
+
+            <svelte:self View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 5px)" Total_Height = "100%"></svelte:self> 
+            <div class = "divResize" style= "width: 10px; min-width: 10px; height:{Child_V1.VRatio}" ></div>
+            <svelte:self View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 5px)" Total_Height = "100%"></svelte:self>     
+
+            <!--
+            <svelte:self View={Child_V1} {ViewList} Total_Width = "40%" Total_Height = "100%"></svelte:self> 
+            <div class = "divResize" style= "width: 10px; min-width: 10px; height:{Child_V1.VRatio}" ></div>
+            <svelte:self View={Child_V2} {ViewList} Total_Width = "50%" Total_Height = "100%"></svelte:self>     
+            -->
+
+         {:else if View.Type === 'V'}
+            <svelte:self View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 5px)"></svelte:self> 
+            <div class = "divResize" style= "width:{Child_V1.HRatio}  height:10px; min-height: 10px;" ></div>
+            <svelte:self View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 5px)"></svelte:self>     
+         {:else}
+            <BoxView ID ={View.Index}></BoxView> 
+         {/if}
+    </div>    
+
+    
+
+
+
+<!--
+    <div class="divCanvas" 
+        style= "width: calc({View.HRatio} - 10px + {View.Offset}); height:{View.VRatio};  display:{View.Display}">    
+        {#if (View.V1 === -1) && (View.V2 === -1)}                
+            <BoxView ID ={View.Index}></BoxView>            
+        {:else if (View.V1 > 0) && (View.V2 > 0)}                 
+            {#if ((Child_V1.Index > 0) && (Child_V2.Index > 0)) }         
+                <svelte:self View={Child_V1} {ViewList}></svelte:self>         
+                    {#if (View.Type === 'H')}
+                        <div class = "divResize" style= "width: 10px; min-width: 10px; height:{Child_V1.VRatio}" ></div>
+                    {:else if (View.Type === 'V') }
+                        <div class = "divResize" style= "height:10px; min-height: 10px; width:{Child_V1.HRatio}" ></div>
+                    {/if}                    
+                <svelte:self View={Child_V2} {ViewList}></svelte:self> 
+            {/if}
+        {:else}
+            <div>GoodBye!!</div>        
         {/if}
-    {:else}
-        <div>GoodBye!!</div>        
-    {/if}
-</div>
+    </div>
+-->
 
 <style>      
     .divCanvas{
-        background-color: blue;         
-        display: inline-flex;           
+        background-color: blue;   
+        /* display: inline-flex;              */
         /*width:      100%;*/
         /* height: calc(100% - 10px);         */
     }     
     .divResize{        
-        background-color: black;                                         
+        background-color: black;                                                 
     }     
 </style>
