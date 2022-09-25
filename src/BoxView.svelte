@@ -1,5 +1,5 @@
 <script>
-    export let  ID = 0;
+    export let  ID = '';
     export let  LType = '';    
     export let  Ratio;
 
@@ -75,7 +75,7 @@
     */
     .btnApply{            
         /* width:   200px; */
-        width:   100px;       
+        width:   80px;       
         height:  calc(100% -10px);       
         margin:  5px;
         cursor:  pointer;

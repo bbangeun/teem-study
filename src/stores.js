@@ -8,3 +8,5 @@ export let dropTarget = writable(null);
 export let dragOrigin = writable(null);
 
 export let currentLayout = writable([]);
+
+export let ViewList = writable([]); //윤 추가
