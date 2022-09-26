@@ -87,14 +87,30 @@
         }       
     })
     */
+    const spliteButtonClick = event => {
+        console.log(`ParentView::Splite [${event.detail}]`);
+    }
+    const removeButtonClick = event => {
+        console.log(`ParentView::Remove [${event.detail}]`);
+
+        for(let i = 0; i < $ViewList.length; i++)
+        {
+            if($ViewList[i].Index === event.detail)
+            {
+                $ViewList.pop();
+                console.log(`ParentView::Removing [${event.detail}]`);
+                break;
+            }
+        }
+        $ViewList = $ViewList;
+
+        console.log($ViewList);
+        console.log(`ParentView::Removed [${event.detail}]`);
+        
+    }
 
 </script>
 
-<!-- <div class=divCanvas style="left: 0px; top: 0px; width:{View.HRatio}; height:{View.VRatio}; " > -->
-
-    <!-- 부모 일경우 -->
-
-    <!-- 부모가 아닐 경우 -->
     <div id = {View.Index}
          class="divCanvas" 
          style= "width: {Total_Width}; height:{Total_Height}; display:{View.Display}">              
@@ -104,20 +120,18 @@
             <div class = "divResize" style= "width: 10px; min-width: 10px; height:{Child_V1.VRatio}" ></div>
             <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 5px)" Total_Height = "100%"></svelte:self>     
 
-            <!--
-            <svelte:self View={Child_V1} {ViewList} Total_Width = "40%" Total_Height = "100%"></svelte:self> 
-            <div class = "divResize" style= "width: 10px; min-width: 10px; height:{Child_V1.VRatio}" ></div>
-            <svelte:self View={Child_V2} {ViewList} Total_Width = "50%" Total_Height = "100%"></svelte:self>     
-            -->
-
          {:else if View.Type === 'V'}
             <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 5px)"></svelte:self> 
             <div class = "divResize" style= "width:{Child_V1.HRatio}  height:10px; min-height: 10px;" ></div>
             <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 5px)"></svelte:self>     
          {:else}
-            <BoxView bind:ID ={View.Title}></BoxView> 
+            <BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick}></BoxView> 
+            <!-- <BoxView bind:Index ={View.Index} on:spliteClick on:removeClick></BoxView>  -->
          {/if}
     </div>    
+
+    
+
 
     
 

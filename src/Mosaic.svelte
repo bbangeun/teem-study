@@ -192,6 +192,8 @@
       return ResultIndex;
     }
 
+
+
     </script>
 
     <div class=divCanvas>
@@ -203,7 +205,7 @@
         {#each $ViewList as V}
           {#if V.Index === 0}           
             <!-- <FlexibleView View={V} StartView={(($ViewList[1]))} EndView={($ViewList[2])} {ViewList}/> -->
-            <FlexibleView bind:View={V} {ViewList} Total_Width="100%" Total_Height="100%"/>
+            <FlexibleView bind:View={V} {ViewList}  Total_Width="100%" Total_Height="100%" on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick}/>
           {/if}
         {/each} 
       </div>

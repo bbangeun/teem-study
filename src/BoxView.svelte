@@ -1,15 +1,22 @@
 <script>
-    export let  ID = '';
+     import { createEventDispatcher } from "svelte";
+    
+    export let  Index = '';
     export let  LType = '';    
     export let  Ratio;
+
+    const dispatchSplite = createEventDispatcher();
+    const dispatchRemove = createEventDispatcher(); 
 
     console.log('******************************')
     console.log('BoxView:{ID}')
     console.log('******************************')
 
-    function onClickedSplite(){        
+    function onClickedSplite(){
+        dispatchSplite('spliteClick', Index);        
     }
-    function onClickedRemove(){    
+    function onClickedRemove(){
+        dispatchRemove('removeClick', Index);    
     }
 </script>
 
@@ -20,7 +27,7 @@
             <button class="btnApply" type="button" on:click="{onClickedSplite}">분리</button> 
             <button class="btnApply" type="button" on:click="{onClickedRemove}">삭제</button>         
         </header>       
-        <div id="idContainer" class="divCContainer">{ID}</div>               
+        <div id="idContainer" class="divCContainer">{Index}</div>               
     </div>
 <!--{/if}-->
 
