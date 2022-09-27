@@ -19,11 +19,10 @@
 
     const dispatchFlexibleRemove = createEventDispatcher(); 
 
-
     ViewList.subscribe(value => {
-        console.log('====subscribe-F===');
-        console.log(value);
-        console.log('====subscribe-F===');
+        console.log('====Subscribe-Start===');
+        console.log(View);
+        console.log(value);        
         for(let i = 0; i < $ViewList.length; i++)
         {
             if(View.V1 === $ViewList[i].Index){            
@@ -35,7 +34,8 @@
                 Child_V2 = $ViewList[i];
                 console.log(`Set Complete End ${Child_V2}`);
             }
-        }		  
+        }
+        console.log('====Subscribe-End===');		  
     });
 
     
