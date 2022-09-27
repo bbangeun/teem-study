@@ -3,6 +3,8 @@
     import { ViewList } from './stores.js'
     import BoxView from './BoxView.svelte'
     import {onMount} from 'svelte'
+    import { createEventDispatcher } from "svelte";
+    
 
     export let View =  writable({});
     //export let ViewList;        
@@ -14,6 +16,9 @@
 
     export let Total_Width  = '0%';
     export let Total_Height = '0%';
+
+    const dispatchFlexibleRemove = createEventDispatcher(); 
+
 
     ViewList.subscribe(value => {
         console.log('====subscribe-F===');
@@ -87,10 +92,16 @@
         }       
     })
     */
+
+  
     const spliteButtonClick = event => {
-        console.log(`ParentView::Splite [${event.detail}]`);
+        console.log(`Child::Splite [${event.detail}]`);
     }
     const removeButtonClick = event => {
+        console.log(`Child::Remove [${event.detail}]`);
+        dispatchFlexibleRemove('FlexibleRemove', event.detail);  
+
+        /*
         console.log(`ParentView::Remove [${event.detail}]`);
 
         for(let i = 0; i < $ViewList.length; i++)
@@ -106,8 +117,8 @@
 
         console.log($ViewList);
         console.log(`ParentView::Removed [${event.detail}]`);
-        
-    }
+        */
+    }  
 
 </script>
 
@@ -116,17 +127,18 @@
          style= "width: {Total_Width}; height:{Total_Height}; display:{View.Display}">              
          {#if      View.Type === 'H'}
 
-            <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 5px)" Total_Height = "100%"></svelte:self> 
+            <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 5px)" Total_Height = "100%" on:FlexibleRemove></svelte:self> 
             <div class = "divResize" style= "width: 10px; min-width: 10px; height:{Child_V1.VRatio}" ></div>
-            <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 5px)" Total_Height = "100%"></svelte:self>     
+            <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 5px)" Total_Height = "100%" on:FlexibleRemove></svelte:self>     
 
          {:else if View.Type === 'V'}
-            <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 5px)"></svelte:self> 
+            <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 5px)" on:FlexibleRemove></svelte:self> 
             <div class = "divResize" style= "width:{Child_V1.HRatio}  height:10px; min-height: 10px;" ></div>
-            <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 5px)"></svelte:self>     
+            <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 5px)" on:FlexibleRemove></svelte:self>     
          {:else}
             <BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick}></BoxView> 
             <!-- <BoxView bind:Index ={View.Index} on:spliteClick on:removeClick></BoxView>  -->
+          
          {/if}
     </div>    
 

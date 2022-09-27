@@ -192,7 +192,75 @@
       return ResultIndex;
     }
 
+    const clickedRemove = event => {
+      let RemovedIndex = 0;
+      let PairViewIndex = 0;    
+     
+      let ParentView;
+      let PParentView;
+      let RemovedView;
+      let PairView; 
+      RemovedIndex = event.detail;
 
+      console.log(`Parent::Remove [${RemovedIndex}]`);
+
+      RemovedView = GetViewFromList(RemovedIndex);
+      ParentView  = GetViewFromList(RemovedView.PID);
+      PParentView = GetViewFromList(ParentView.PID);
+
+      if((RemovedView.PID >= 0) && (ParentView.Index >= 0)){
+        if(ParentView.V1 === RemovedView.Index ){
+          PairViewIndex = ParentView.V2;  
+        }
+        else{
+          PairViewIndex = ParentView.V1;
+        }
+ 
+        for(let i =0; i<$ViewList.length; i++){
+          if(RemovedView.Index === $ViewList[i].Index ){
+            $ViewList.splice(i, 1);   
+            console.log($ViewList);
+            console.log(`Parent::Removed1 [${RemovedView.Index}]`);  
+            break;
+          }
+        }
+       
+
+        if(PParentView.V1 === ParentView.Index){
+          PParentView.V1 = PairViewIndex;
+        }else if(PParentView.V2 === ParentView.Index){
+          PParentView.V2 = PairViewIndex;  
+        }
+
+        PairView = GetViewFromList(PairViewIndex);
+        PairView.PID = PParentView.Index;
+        PairView.HRatio = ParentView.HRatio;
+        PairView.VRatio = ParentView.VRatio;
+
+        for(let i =0; i<$ViewList.length; i++){
+          if(ParentView.Index === $ViewList[i].Index ){
+            $ViewList.splice(i, 1);   
+            console.log($ViewList);
+            console.log(`Parent::Removed2 [${ParentView.Index}]`);  
+            break;
+          }
+        }        
+
+        Object.freeze(ParentView);
+        Object.freeze(RemovedView);
+        console.log(`========================================`);
+        console.log($ViewList);  
+        console.log(`========================================`);
+        $ViewList = $ViewList;
+      }
+      else{
+        if( (ParentView.PID < 0) && (RemovedView.Index === 0) ){
+          console.log(`Parent::Last View[${RemovedView.Index}]`);
+        }else{
+          console.log(`Parent::Abnormal Removed Process[2][${RemovedView.Index}]`);
+        }
+      }
+    }
 
     </script>
 
@@ -205,7 +273,7 @@
         {#each $ViewList as V}
           {#if V.Index === 0}           
             <!-- <FlexibleView View={V} StartView={(($ViewList[1]))} EndView={($ViewList[2])} {ViewList}/> -->
-            <FlexibleView bind:View={V} {ViewList}  Total_Width="100%" Total_Height="100%" /> 
+            <FlexibleView bind:View={V} {ViewList}  Total_Width="100%" Total_Height="100%" on:FlexibleRemove={clickedRemove} /> 
           {/if}
         {/each} 
       </div>
