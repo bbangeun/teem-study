@@ -210,18 +210,83 @@
 
       console.log(`Parent::Remove Start [${RemovedIndex}]`);
 
+      /*
+      RemovedView = GetViewFromList(RemovedIndex);
+      RemovedView.Title = '99';
+      RemovedView.HRatio = '50%';      
+      */     
+
       console.log(" ");
       console.log("============================================================1");
-      RemoveElement = document.getElementById(RemovedIndex.toString());
+      RemoveElement = document.getElementById('4');
       console.log("============================================================2");
       console.log(RemoveElement);
       RemoveElement.parentNode.removeChild(RemoveElement);
       console.log("============================================================3");
-      console.log(" ");
+      console.log(" "); 
 
-   
       RemovedView = GetViewFromList(RemovedIndex);
 
+      for(let i =0; i<$ViewList.length; i++){
+        if(RemovedView.Index === $ViewList[i].Index ){
+          $ViewList.splice(i, 1);   
+          console.log($ViewList);
+          console.log(`Parent::Removed1 [${RemovedView.Index}]`);  
+          break;
+        }
+      }
+
+      //$ViewList = $ViewList;
+
+      console.log(RemovedView);
+
+      ParentView  = GetViewFromList(RemovedView.PID);
+
+      if(ParentView.V1 === RemovedView.Index){
+          PairView = GetViewFromList(ParentView.V2);
+      }
+      else{
+        PairView = GetViewFromList(ParentView.V1);
+      }
+
+      PairView.HRatio = ParentView.HRatio;
+      PairView.VRatio = ParentView.VRatio;
+    
+
+      if(ParentView.PID >= 0)
+      { 
+        PParentView = GetViewFromList(ParentView.PID);        
+       
+        if(PParentView.V1 === ParentView.Index){
+          PParentView.V1 = PairView.Index; 
+        }
+        else{
+          PParentView.V2 = PairView.Index;
+        }
+
+        PairView.PID = PParentView.Index;
+
+        for(let i =0; i<$ViewList.length; i++){
+          if(ParentView.Index === $ViewList[i].Index ){
+            $ViewList.splice(i, 1);
+            console.log(`Parent::Removed2 [${ParentView.Index}]`);  
+            break;
+          }
+        }
+        
+        console.log('*************************'); 
+        console.log($ViewList); 
+        console.log(PParentView);
+        console.log('*************************'); 
+      }
+     
+
+      $ViewList = $ViewList;
+
+ 
+      
+      /*
+      RemovedView = GetViewFromList(RemovedIndex);
       if(RemovedView.PID >= 0){
         ParentView  = GetViewFromList(RemovedView.PID);
 
@@ -269,19 +334,21 @@
             break;
           }
         }
-
+       
+  
         Object.freeze(ParentView);
         Object.freeze(RemovedView);
+      
+      
         console.log($ViewList);
 
         $ViewList = $ViewList;
 
-        
       }else{
         console.log(`Parent View[Index:${RemovedIndex}, PID:${RemovedView.PID}]`);
       }
-      
-      
+      */
+   
 
       /*
       if((RemovedView.PID >= 0) && (ParentView.Index >= 0)){

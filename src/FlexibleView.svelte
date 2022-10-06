@@ -23,6 +23,7 @@
         console.log('====Subscribe-Start===');
         console.log(View);
         console.log(value);        
+        
         for(let i = 0; i < $ViewList.length; i++)
         {
             if(View.V1 === $ViewList[i].Index){            
@@ -35,6 +36,7 @@
                 console.log(`Set Complete End ${Child_V2}`);
             }
         }
+
         console.log('====Subscribe-End===');		  
     });
 
