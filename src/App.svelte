@@ -4,6 +4,7 @@
   import Mosaic from './Mosaic.svelte'
   import DynamicLayout from './DynamicLayout.svelte'
   import Split from './Split.svelte';
+  import Drag from './Drag.svelte';
   export let url = ''
 </script>
 
@@ -42,12 +43,14 @@
       <Link to="Mosaic">Mosaic</Link> 
       <Link to="DynamicLayout">Layout</Link>
       <Link to="Split">Split</Link> 
+      <Link to="Drag">Drag</Link> 
     </nav>
     <div class="divContent">
       <Route path="/"><InitPage /></Route>
       <Route path="Mosaic" component={Mosaic} /> 
       <Route path="DynamicLayout" component={DynamicLayout}/>
       <Route path="Split" component={Split} /> 
+      <Route path="Drag" component={Drag} /> 
     </div>
   </Router>
 </div>

@@ -2,34 +2,18 @@
     import { object_without_properties, to_number } from 'svelte/internal'
     import { writable } from 'svelte/store'
     import BoxView      from './BoxView.svelte'
-    import FlexibleView from './FlexibleView.svelte'
-
+ 
     
-    import { ViewList } from './stores.js'    
-
-    class ViewBox{
-      constructor(Index, PID, Type, HRatio, VRatio, V1, V2, Title, Display){
-        this.Index = Index,
-        this.PID   = PID,
-        this.Type  = Type,
-        this.Title = Title;
-        this.HRatio = HRatio,        
-        this.VRatio = VRatio,        
-        this.V1   = V1,
-        this.V2   = V2;
-        this.HRealRatio = "calc({HRatio} - 10px)"        
-        this.VRealRatio = "calc({VRatio} - 10px)"  
-        this.Offset = (((V1 > 0) && (V2 > 0)) || (PID > 0)) ? '10px' : '0px';
-        //this.Display = (this.Type === 'H') ? 'inline-flex' : 'Block';
-        this.Display = Display;                  
-      }
-    }
+    import FlexibleView from './FlexibleView.svelte'    
+    
+    import { ViewList , ViewBox } from './stores.js'
 
     let NewViewBox;    
 
+    let TopParentView;
+
     let ID = 0;
-    //let ViewList = writable([]);
-  
+    //let ViewList = writable([]);  
   
     NewViewBox =  new ViewBox(ID, -1, 'H', '100%', '100%', 1, 2, ID.toString, 'inline-flex' );
     $ViewList.push(NewViewBox);
@@ -37,14 +21,37 @@
     NewViewBox =  new ViewBox(1,  0,  'N', '40%', '100%', -1, -1, '1', 'Block');
     $ViewList.push(NewViewBox);
 
-    NewViewBox =  new ViewBox(2,  0,  'V', '60%', '100%', 3, 4, '2', 'Block');
-    $ViewList.push(NewViewBox);    
+    NewViewBox =  new ViewBox(2,  0,  'N', '60%', '100%', -1, -1, '2', 'Block');
+    $ViewList.push(NewViewBox);   
 
-    NewViewBox =  new ViewBox(3,  2,  'N', '100%', '50%', -1, -1, '3', 'Block');
+       /* 
+    NewViewBox =  new ViewBox(3,  2,  'H', '100%', '50%', 5, 6, '3', 'inline-flex');
     $ViewList.push(NewViewBox);
 
     NewViewBox =  new ViewBox(4,  2,  'N', '100%', '50%', -1, -1, '4', 'Block');
     $ViewList.push(NewViewBox);  
+
+  
+    NewViewBox =  new ViewBox(5,  3,  'N', '70%', '100%', -1, -1, '5');
+    $ViewList.push(NewViewBox);        
+
+    NewViewBox =  new ViewBox(6,  3,  'N', '30%', '100%', -1, -1, '6');
+    $ViewList.push(NewViewBox);  
+    
+    NewViewBox =  new ViewBox(7,  4,  'N', '100%', '50%', -1, -1, '5');
+    $ViewList.push(NewViewBox);        
+
+    NewViewBox =  new ViewBox(8,  4,  'N', '100%', '50%', -1, -1, '6');
+    $ViewList.push(NewViewBox);  
+    */
+    
+      
+
+    TopParentView = $ViewList[0];
+
+
+   
+
     
     /*
     NewViewBox =  new ViewBox(1,  0,  'H', '60%', '100%', 3, 4, '1');
@@ -85,8 +92,6 @@
     NewViewBox =  new ViewBox(12,  8,  'N', '100%', '30%', -1, -1, '12');
     $ViewList.push(NewViewBox);   
     */
-
-
  
 
     $ViewList.sort(function compare(a, b) {
@@ -94,10 +99,9 @@
     });
     
     $ViewList = $ViewList;
-    console.log('===================================================');
-    console.log($ViewList);
-    console.log('==================================================='); 
-  
+
+
+    /*
     function onClickedAdd () {
 
       let TopRightIndex = 0;
@@ -149,6 +153,122 @@
       }
 
     }
+    */
+    function onClickedAdd () {
+
+        let TopRightIndex = 0;
+        let TopRightView  = {};
+        let ParentView    = {};
+        let V1            = {};
+        let V2            = {};
+        let LastIndex     = 0;   
+        let TopRightElement;
+        let NewViewHRatio = '';
+        let NewViewVRatio = '';
+        let TopParentIndex = 0;
+
+        let NewParentView = {};
+
+        console.log('----------------------------------------------');
+        console.log($ViewList);        
+        console.log('----------------------------------------------');
+
+        TopParentIndex = GetTopParentIndex();
+        TopRightIndex = GetTopRightWindow(TopParentIndex);
+        TopRightView  = GetViewFromList(TopRightIndex);
+
+        if(TopRightView.PID  >= 0){       
+          ParentView    = GetViewFromList(TopRightView.PID);
+        }       
+
+        LastIndex = $ViewList[($ViewList.length-1)].Index;   
+
+        TopRightElement = document.getElementById(TopRightView.Index);
+
+        if(TopRightView.PID  >= 0){      
+          NewParentView         =  new ViewBox(++LastIndex, TopRightView.PID);
+        }
+        else{
+          NewParentView         =  new ViewBox(++LastIndex, -1);
+        }
+        NewParentView.HRatio  =  TopRightView.HRatio;
+        NewParentView.VRatio  =  TopRightView.VRatio;
+
+        V2 =  new ViewBox(++LastIndex, NewParentView.Index);
+
+        if(TopRightElement){
+          if(TopRightElement.clientWidth >= TopRightElement.clientHeight){      
+            NewParentView.Type = 'H';
+            NewParentView.Display = 'inline-flex';
+
+            TopRightView.Type = 'N';
+            TopRightView.HRatio = '50%';
+            TopRightView.VRatio = '100%';
+            TopRightView.Display = 'Block';
+            
+
+            V2.Type = 'N';
+            V2.HRatio = '50%';
+            V2.VRatio = '100%';
+            V2.Display = 'Block';          
+          } 
+          else{
+            NewParentView.Type = 'V';
+            NewParentView.Display = 'Block';
+
+            TopRightView.Type = 'N';
+            TopRightView.HRatio = '100%';
+            TopRightView.VRatio = '50%';
+            TopRightView.Display = 'Block';
+
+            V2.Type = 'N';
+            V2.HRatio = '100%';
+            V2.VRatio = '50%';
+            V2.Display = 'Block';    
+          }
+
+          TopRightView.PID = NewParentView.Index;
+          
+          V2.V1 = -1;
+          V2.V2 = -1;
+
+          NewParentView.V1 = TopRightView.Index;
+          NewParentView.V2 = V2.Index;
+
+          if(TopRightView.PID  >= 0){    
+            if(ParentView.V1 === TopRightView.Index){
+              ParentView.V1 = NewParentView.Index;
+            }else{
+              ParentView.V2 = NewParentView.Index;
+            }
+          }
+
+
+          $ViewList.push(NewParentView);   
+          $ViewList.push(V2);   
+
+          if(NewParentView.PID  >= 0){
+            $ViewList = $ViewList;
+          }else{
+            TopParentView = NewParentView;
+          }
+
+          //TopParentView = $ViewList[0];
+          
+          console.log($ViewList);
+          console.log(`Compelted Add TopRightWindow ${V2.Index}`);     
+        }
+        else{
+
+          console.log(`Failed Add TopRightWindow ${V2.Index}`);
+        }
+
+        console.log($ViewList);
+        console.log('----------------------------------------------');
+
+      }
+
+
     function onClickedRefresh () {
       const Parent = document.getElementById('idContainer')
       if (Parent.childElementCount > 0) {
@@ -170,6 +290,22 @@
 
       return ResultView;
     }
+    function GetTopParentIndex(){
+      let ResultIndex;
+
+      for(let i = 0; i < $ViewList.length; i++){
+
+        if($ViewList[i].PID == -1){            
+            ResultIndex = $ViewList[i].Index;
+            break;
+        }
+      }
+
+      return ResultIndex;
+    }
+  
+
+   
 
     function GetTopRightWindow(Index){
       let ResultIndex = 0;
@@ -192,219 +328,180 @@
       return ResultIndex;
     }
 
-    
+    const EventRemoveChild = event => {
+      console.log(`Remove Failed::Top Parent View [${event.detail}]`);
+    }
+    const EventRemoveParent = event => {
 
-
-    const clickedRemove = event => {
-
-      let RemovedIndex = 0;
-      let PairViewIndex = 0;    
+      let RemovedIndex = 0;     
      
       let ParentView;
-      let PParentView;
+      
       let RemovedView;
       let PairView; 
+
       let RemoveElement;
+      let PairElement;   
 
       RemovedIndex = event.detail;
 
-      console.log(`Parent::Remove Start [${RemovedIndex}]`);
+      console.log(`Top Parent::Remove Start [${RemovedIndex}]`);
 
+      RemovedView = GetViewFromList(event.detail);
+
+      if(RemovedView.PID >= 0){
+        
+          ParentView  = GetViewFromList(RemovedView.PID);
+
+          if(ParentView.V1 === RemovedView.Index){
+          PairView = GetViewFromList(ParentView.V2);
+          }else{
+          PairView = GetViewFromList(ParentView.V1);
+          }
+
+          PairView.HRatio = ParentView.HRatio;
+          PairView.VRatio = ParentView.VRatio;
+          PairView.Type   = 'N';
+          PairView.Display = 'Block';
+          PairView.PID = -1;
+
+          for(let i =0; i<$ViewList.length; i++){
+            if(RemovedView.Index === $ViewList[i].Index ){
+              $ViewList.splice(i, 1);
+              console.log(`Top Parent::RemovedView Removed [${RemovedView.Index}]`);  
+              break;
+            }
+          }
+          for(let i =0; i<$ViewList.length; i++){
+            if(ParentView.Index === $ViewList[i].Index ){
+              $ViewList.splice(i, 1);
+              console.log(`Top Parent::ParentView Removed [${ParentView.Index}]`);  
+              break;
+            }
+          }
+
+          TopParentView = PairView;
+      }else{
+        console.log(`Remove Failed::Top Parent View [${RemovedIndex}]`);
+      }      
+
+      console.log(`Top Parent::Remove End [${RemovedIndex}]`);
+
+  
       /*
-      RemovedView = GetViewFromList(RemovedIndex);
-      RemovedView.Title = '99';
-      RemovedView.HRatio = '50%';      
-      */     
-
       console.log(" ");
       console.log("============================================================1");
-      RemoveElement = document.getElementById('4');
+      RemoveElement = document.getElementById(RemovedIndex);
       console.log("============================================================2");
       console.log(RemoveElement);
       RemoveElement.parentNode.removeChild(RemoveElement);
       console.log("============================================================3");
       console.log(" "); 
-
-      RemovedView = GetViewFromList(RemovedIndex);
-
-      for(let i =0; i<$ViewList.length; i++){
-        if(RemovedView.Index === $ViewList[i].Index ){
-          $ViewList.splice(i, 1);   
-          console.log($ViewList);
-          console.log(`Parent::Removed1 [${RemovedView.Index}]`);  
-          break;
-        }
-      }
-
-      //$ViewList = $ViewList;
-
-      console.log(RemovedView);
-
-      ParentView  = GetViewFromList(RemovedView.PID);
-
-      if(ParentView.V1 === RemovedView.Index){
-          PairView = GetViewFromList(ParentView.V2);
-      }
-      else{
-        PairView = GetViewFromList(ParentView.V1);
-      }
-
-      PairView.HRatio = ParentView.HRatio;
-      PairView.VRatio = ParentView.VRatio;
-    
-
-      if(ParentView.PID >= 0)
-      { 
-        PParentView = GetViewFromList(ParentView.PID);        
-       
-        if(PParentView.V1 === ParentView.Index){
-          PParentView.V1 = PairView.Index; 
-        }
-        else{
-          PParentView.V2 = PairView.Index;
-        }
-
-        PairView.PID = PParentView.Index;
-
-        for(let i =0; i<$ViewList.length; i++){
-          if(ParentView.Index === $ViewList[i].Index ){
-            $ViewList.splice(i, 1);
-            console.log(`Parent::Removed2 [${ParentView.Index}]`);  
-            break;
-          }
-        }
-        
-        console.log('*************************'); 
-        console.log($ViewList); 
-        console.log(PParentView);
-        console.log('*************************'); 
-      }
-     
-
-      $ViewList = $ViewList;
-
- 
-      
-      /*
-      RemovedView = GetViewFromList(RemovedIndex);
-      if(RemovedView.PID >= 0){
-        ParentView  = GetViewFromList(RemovedView.PID);
-
-        if(ParentView.V1 === RemovedView.Index){
-          PairView = GetViewFromList(ParentView.V2);
-        }
-        else{
-          PairView = GetViewFromList(ParentView.V1);
-        }
-
-        PairView.HRatio = ParentView.HRatio;
-        PairView.VRatio = ParentView.VRatio;
-        //PairView.Type = ParentView.Type; 
-
-        if(ParentView.PID >= 0)
-        { 
-          PParentView = GetViewFromList(ParentView.PID);
-          
-          if(PParentView.V1 === ParentView.Index){
-            PParentView.V1 = PairView.Index; 
-          }
-          else{
-            PParentView.V2 = PairView.Index;
-          }
-
-          PairView.PID = PParentView.Index;
-        }
-        else{
-          PairView.PID = -1;
-          PairView.Index = 0;
-        }
-
-        for(let i =0; i<$ViewList.length; i++){
-          if(RemovedView.Index === $ViewList[i].Index ){
-            $ViewList.splice(i, 1);
-            console.log(`Parent::Removed1 [${RemovedView.Index}]`);  
-            break;
-          }
-        }
-
-        for(let i =0; i<$ViewList.length; i++){
-          if(ParentView.Index === $ViewList[i].Index ){
-            $ViewList.splice(i, 1);
-            console.log(`Parent::Removed2 [${ParentView.Index}]`);  
-            break;
-          }
-        }
-       
-  
-        Object.freeze(ParentView);
-        Object.freeze(RemovedView);
-      
-      
-        console.log($ViewList);
-
-        $ViewList = $ViewList;
-
-      }else{
-        console.log(`Parent View[Index:${RemovedIndex}, PID:${RemovedView.PID}]`);
-      }
       */
-   
-
-      /*
-      if((RemovedView.PID >= 0) && (ParentView.Index >= 0)){
-        if(ParentView.V1 === RemovedView.Index ){
-          PairViewIndex = ParentView.V2;  
-        }
-        else{
-          PairViewIndex = ParentView.V1;
-        }
  
-        for(let i =0; i<$ViewList.length; i++){
-          if(RemovedView.Index === $ViewList[i].Index ){
-            $ViewList.splice(i, 1);   
-            console.log($ViewList);
-            console.log(`Parent::Removed1 [${RemovedView.Index}]`);  
-            break;
-          }
-        }
-       
-
-        if(PParentView.V1 === ParentView.Index){
-          PParentView.V1 = PairViewIndex;
-        }else if(PParentView.V2 === ParentView.Index){
-          PParentView.V2 = PairViewIndex;  
-        }
-
-        PairView = GetViewFromList(PairViewIndex);
-        PairView.PID = PParentView.Index;
-        PairView.HRatio = ParentView.HRatio;
-        PairView.VRatio = ParentView.VRatio;
-
-        for(let i =0; i<$ViewList.length; i++){
-          if(ParentView.Index === $ViewList[i].Index ){
-            $ViewList.splice(i, 1);   
-            console.log($ViewList);
-            console.log(`Parent::Removed2 [${ParentView.Index}]`);  
-            break;
-          }
-        }        
-
-        Object.freeze(ParentView);
-        Object.freeze(RemovedView);
-        console.log(`========================================`);
-        console.log($ViewList);  
-        console.log(`========================================`);
-        $ViewList = $ViewList;
-      }
-      else{
-        if( (ParentView.PID < 0) && (RemovedView.Index === 0) ){
-          console.log(`Parent::Last View[${RemovedView.Index}]`);
-        }else{
-          console.log(`Parent::Abnormal Removed Process[2][${RemovedView.Index}]`);
-        }
-      }
-      */
     }
+    function SpliteTopView(Index){
+
+        let SpliteView;
+        let ParentView;
+        let New_ParentView;
+        let New_V2;
+        let LastIndex = 0;   
+        let SpliteViewElement;
+
+        console.log(`TopParent::Splite Start [${Index}]`); 
+
+        SpliteView = GetViewFromList(Index);
+        //ParentView = GetViewFromList(SpliteView.PID);
+
+        LastIndex = $ViewList[($ViewList.length-1)].Index;  
+
+        New_ParentView =  new ViewBox(++LastIndex, -1);
+        New_ParentView.Title = New_ParentView.Index.toString();
+
+        /*
+        if(ParentView.V1 === SpliteView.Index){
+            ParentView.V1 = New_ParentView.Index;        
+        }else{
+            ParentView.V2 = New_ParentView.Index;
+        }
+        */
+
+        New_ParentView.HRatio = SpliteView.HRatio;
+        New_ParentView.VRatio = SpliteView.VRatio;
+
+
+        SpliteViewElement = document.getElementById(SpliteView.Index);
+
+        New_V2 =  new ViewBox(New_ParentView.Index + 1, New_ParentView.Index);
+        SpliteView.PID = New_ParentView.Index;
+        SpliteView.Type = 'N';
+        SpliteView.HRatio = '100%';
+        SpliteView.VRatio = '100%';
+        SpliteView.Display = 'Block';
+        SpliteView.V1 = -1;
+        SpliteView.V2 = -1;
+        SpliteView.Title = SpliteView.Index.toString();
+
+        New_V2.Type = 'N';
+        New_V2.HRatio = '100%';
+        New_V2.VRatio = '100%';
+        New_V2.Display = 'Block';
+        New_V2.V1 = -1;  
+        New_V2.V2 = -1;  
+        New_V2.Title = New_V2.Index.toString();
+
+        New_ParentView.V1 = SpliteView.Index;
+        New_ParentView.V2 = New_V2.Index;       
+
+        if(SpliteViewElement){
+            if(SpliteViewElement.clientWidth >= SpliteViewElement.clientHeight){ 
+                New_ParentView.Type = 'H';
+                New_ParentView.Display = 'inline-flex';
+
+                SpliteView.HRatio = '50%';
+                New_V2.HRatio = '50%';
+            } 
+            else{
+                New_ParentView.Type = 'V';
+                New_ParentView.Display = 'Block';
+
+                SpliteView.VRatio = '50%';
+                New_V2.VRatio = '50%'; 
+            }
+        }   
+
+        $ViewList.push(New_ParentView);   
+        $ViewList.push(New_V2);
+
+        //$ViewList = $ViewList;
+
+        /*
+        for(let i = 0; i < $ViewList.length; i++)
+        {
+            if(View.V1 === $ViewList[i].Index){            
+                Child_V1 = $ViewList[i];
+                console.log(Child_V1);     
+                console.log(`Set Complete V1 ${View.V1}`);                
+            }
+
+            if(View.V2 === $ViewList[i].Index){          
+                Child_V2 = $ViewList[i];
+                console.log(Child_V2); 
+                console.log(`Set Complete V2 ${View.V2}`);
+            }
+        }
+        */
+        TopParentView = New_ParentView;
+
+        console.log($ViewList);
+        console.log(`TopParent::Splite End [${Index}] V:${TopParentView.Index} V1:${TopParentView.V1} V2:${TopParentView.V2}`);
+    }
+    const EventSpliteParent = event => {   
+      SpliteTopView(event.detail);        
+    }
+
+
 
     </script>
 
@@ -414,12 +511,15 @@
         <button class="btnApply" type="button" on:click="{onClickedRefresh}">삭제</button>        
       </header>
       <div id="idContainer" class="divContainer">
+        <FlexibleView bind:View={TopParentView} {ViewList}  Total_Width="100%" Total_Height="100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteParent} />
+        
+        <!--
         {#each $ViewList as V}
-          {#if V.Index === 0}           
-            <!-- <FlexibleView View={V} StartView={(($ViewList[1]))} EndView={($ViewList[2])} {ViewList}/> -->
-            <FlexibleView bind:View={V} {ViewList}  Total_Width="100%" Total_Height="100%" on:FlexibleRemove={clickedRemove} /> 
-          {/if}
-        {/each} 
+          {#if V.Index === 0}
+            <FlexibleView bind:View={V} {ViewList}  Total_Width="100%" Total_Height="100%" on:RemoveParent={EventRemoveParent} />  
+           {/if}
+        {/each}  
+        -->
       </div>
     </div>
 

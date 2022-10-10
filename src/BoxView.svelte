@@ -9,7 +9,7 @@
     const dispatchRemove = createEventDispatcher(); 
 
     console.log('******************************')
-    console.log('BoxView:{ID}')
+    console.log(`BoxView:${Index}`)
     console.log('******************************')
 
     function onClickedSplite(){
