@@ -47,10 +47,7 @@
     
       
 
-    TopParentView = $ViewList[0];
-
-
-   
+    TopParentView = $ViewList[0];   
 
     
     /*
@@ -500,19 +497,79 @@
     const EventSpliteParent = event => {   
       SpliteTopView(event.detail);        
     }
+    function ClearViewList(){
+      
+      let Legnth = $ViewList.length;
+      let View;
+
+      for(let i = Legnth-1; i >= 0; i--)
+      {
+        View = $ViewList[i];
+        console.log(View);
+        $ViewList.splice(i, 1);
+        Object.freeze(View);
+      }
+
+      //$ViewList = $ViewList;
+
+      console.log($ViewList);
+
+      TopParentView = {};
+
+      $ViewList = $ViewList;
+    }  
 
 
+    function onClickedLoad1()
+    {
+      ClearViewList();
+      
+      NewViewBox =  new ViewBox(ID, -1, 'V', '100%', '100%', 1, 2, ID.toString, 'Block' );
+      $ViewList.push(NewViewBox);
+
+      NewViewBox =  new ViewBox(1,  0,  'V', '100%', '40%', 3,  4, '1', 'Block');
+      $ViewList.push(NewViewBox);
+
+      NewViewBox =  new ViewBox(2,  0,  'N', '100%', '60%', -1, -1,  '2', 'Block');
+      $ViewList.push(NewViewBox);   
+       
+      NewViewBox =  new ViewBox(3,  1,  'N', '100%', '50%', -1, -1, '3', 'Block');
+      $ViewList.push(NewViewBox);
+
+      NewViewBox =  new ViewBox(4,  1,  'N', '100%', '50%', -1, -1, '4', 'Block');
+      $ViewList.push(NewViewBox);
+
+      TopParentView = $ViewList[0];
+
+      $ViewList = $ViewList;
+    }
+    function onClickedLoad2()
+    {
+      ClearViewList();
+    }
+    function onClickedLoad3(){}
+    function onClickedLoad4(){}
+    function onClickedLoad5(){}
 
     </script>
 
     <div class=divCanvas>
       <header class="hdTop">
+        <button class="btnLoad"  type="button" on:click="{onClickedLoad1}">1</button>
+        <button class="btnLoad"  type="button" on:click="{onClickedLoad2}">2</button>
+        <button class="btnLoad"  type="button" on:click="{onClickedLoad3}">3</button>
+        <button class="btnLoad"  type="button" on:click="{onClickedLoad4}">4</button>
+        <button class="btnLoad"  type="button" on:click="{onClickedLoad5}">5</button>
+
         <button class="btnApply" type="button" on:click="{onClickedAdd}">추가</button> 
-        <button class="btnApply" type="button" on:click="{onClickedRefresh}">삭제</button>        
+        <!--
+        <button class="btnApply" type="button" on:click="{onClickedRefresh}">삭제</button>
+        -->        
       </header>
       <div id="idContainer" class="divContainer">
-        <FlexibleView bind:View={TopParentView} {ViewList}  Total_Width="100%" Total_Height="100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteParent} />
-        
+        {#if $ViewList.length > 0}
+          <FlexibleView bind:View={TopParentView} {ViewList}  Total_Width="100%" Total_Height="100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteParent} />
+        {/if}
         <!--
         {#each $ViewList as V}
           {#if V.Index === 0}
@@ -536,7 +593,7 @@
       .hdTop{
         background-color: blueviolet;
         display: flex; 			
-        justify-content: right;
+        
         width:   100%;
         height:  50px;
         margin:  0px;
@@ -564,5 +621,23 @@
         height:  calc(100% -10px);       
         margin:  5px;
         cursor: pointer;
+        margin-left:  auto;
+        margin-right: 10px;
+        font-size: 14px; 
+        padding: 0px; 
+     
       }
+
+      .btnLoad{            
+        width:   40px;       
+        height:  calc(100% -10px);        
+        margin:  10px;
+        padding: 0px;
+        text-align: center;
+        font-size: 14px;   
+       
+          
+      }
+
+      
     </style>

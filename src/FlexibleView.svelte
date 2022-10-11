@@ -126,18 +126,17 @@
                 console.log(`Set Complete End ${View.V2}`);
             }
         }
-
+  
         ResizeID = `R${View.Index}`;
         console.log(ResizeID);  
-
        
-        const item = document.getElementById(ResizeID);   
-
+        const item = document.getElementById(ResizeID);
+       
         item.removeEventListener("drag", DragProcess);
-        item.removeEventListener("dragend", DragProcess);
+        item.removeEventListener("dragend", DragProcess);        
         
         item.addEventListener("drag",    DragProcess);
-        item.addEventListener("dragend", DragProcess);
+        item.addEventListener("dragend", DragProcess);      
    
 
         /*
