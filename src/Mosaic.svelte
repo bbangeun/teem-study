@@ -19,23 +19,50 @@
 
     let ID = 0;
 
+    let LoadParentArray = [];
+    let LoadChildArray = [];
+
     onMount(async ()=>{   
         console.log('----------------------------------------------');
         console.log('Mosaic onMount Start');
         console.log('----------------------------------------------');
-        /*
-        const res = await fetch("http://127.0.0.1:8080/pane/1")
+      
+        const res = await fetch("http://127.0.0.1:8887/pane/1")
           .then(response => response.json())
           .then(data => {
-          console.log(data);
+          
+          console.log('=====================================');
+          console.log(data.page_id);
+          console.log(data.structure);
+
+          LoadParentArray = data.structure.split('$#$');
+          console.log(LoadParentArray);
+          for(let i = 0; i < LoadParentArray.length; i++ )
+          {
+            LoadChildArray = LoadParentArray[i].split(',');
+            console.log(LoadChildArray);
+            NewViewBox = new ViewBox(LoadChildArray[0],
+                                     LoadChildArray[1],
+                                     LoadChildArray[2],
+                                     LoadChildArray[3],
+                                     LoadChildArray[4],
+                                     LoadChildArray[5],
+                                     LoadChildArray[6],
+                                     LoadChildArray[0],
+                                     LoadChildArray[7]);
+            console.log(NewViewBox);
+
+            $ViewList.push(NewViewBox);
+          }
+          console.log('=====================================');
           apiData.set(data);
         }).catch(error => {
           console.log(error);
           return [];
         });
-        */
+      
 
-        
+        /*
         NewViewBox =  new ViewBox(ID, -1, 'H', '100%', '100%', 1, 2, ID.toString, 'inline-flex' );
         $ViewList.push(NewViewBox);
 
@@ -44,6 +71,7 @@
 
         NewViewBox =  new ViewBox(2,  0,  'N', '60%', '100%', -1, -1, 'Index-2', 'Block');
         $ViewList.push(NewViewBox);
+        */
         
         $ViewList.sort(function compare(a, b) {
           return a.Index - b.Index;
@@ -612,8 +640,59 @@
       console.log(`Load0 End`);
       */
     }
-    function onClickedLoad2(){}    
-    function onClickedLoad3(){}
+    function onClickedLoad2(){ ClearViewList();     }    
+    async function onClickedLoad3()
+    {  
+        console.log('----------------------------------------------');
+        console.log('onClickedLoad3');
+        console.log('----------------------------------------------');
+      
+        const res = await fetch("http://127.0.0.1:8887/pane/1")
+          .then(response => response.json())
+          .then(data => {
+          
+          console.log('=====================================');
+          console.log(data.page_id);
+          console.log(data.structure);
+
+          LoadParentArray = data.structure.split('$#$');
+          console.log(LoadParentArray);
+          for(let i = 0; i < LoadParentArray.length; i++ )
+          {
+            LoadChildArray = LoadParentArray[i].split(',');
+            console.log(LoadChildArray);
+            NewViewBox = new ViewBox(LoadChildArray[0],
+                                     LoadChildArray[1],
+                                     LoadChildArray[2],
+                                     LoadChildArray[3],
+                                     LoadChildArray[4],
+                                     LoadChildArray[5],
+                                     LoadChildArray[6],
+                                     LoadChildArray[0],
+                                     LoadChildArray[7]);
+            console.log(NewViewBox);
+
+            $ViewList.push(NewViewBox);
+          }
+          console.log('=====================================');
+          apiData.set(data);
+        }).catch(error => {
+          console.log(error);
+          return [];
+        });
+      
+
+     
+        
+    
+
+        TopParentView = $ViewList[0];
+
+        console.log('----------------------------------------------');
+        console.log('Mosaic onMount End');
+        console.log('----------------------------------------------');
+
+    }
     function onClickedLoad4(){}
     function onClickedLoad5(){}
     function onClickedSave(){}
