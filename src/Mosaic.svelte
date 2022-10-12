@@ -18,10 +18,10 @@
     NewViewBox =  new ViewBox(ID, -1, 'H', '100%', '100%', 1, 2, ID.toString, 'inline-flex' );
     $ViewList.push(NewViewBox);
 
-    NewViewBox =  new ViewBox(1,  0,  'N', '40%', '100%', -1, -1, '1', 'Block');
+    NewViewBox =  new ViewBox(1,  0,  'N', '40%', '100%', -1, -1, '1010', 'Block');
     $ViewList.push(NewViewBox);
 
-    NewViewBox =  new ViewBox(2,  0,  'N', '60%', '100%', -1, -1, '2', 'Block');
+    NewViewBox =  new ViewBox(2,  0,  'N', '60%', '100%', -1, -1, '2020', 'Block');
     $ViewList.push(NewViewBox);   
 
        /* 
@@ -273,7 +273,6 @@
         Parent.removeChild(Obj)
       }
     }
-
     function GetViewFromList(Index){
       let ResultView  = {};
 
@@ -300,10 +299,6 @@
 
       return ResultIndex;
     }
-  
-
-   
-
     function GetTopRightWindow(Index){
       let ResultIndex = 0;
       let View = {};
@@ -501,29 +496,56 @@
       
       let Legnth = $ViewList.length;
       let View;
-
+      let RemoveE;      
+  
       for(let i = Legnth-1; i >= 0; i--)
       {
         View = $ViewList[i];
+        //View = null;
         console.log(View);
-        $ViewList.splice(i, 1);
+        //$ViewList.splice(i, 1);
         Object.freeze(View);
       }
+
+      $ViewList = [];
 
       //$ViewList = $ViewList;
 
       console.log($ViewList);
 
-      TopParentView = {};
+      /*
+      console.log(`ClearViewList Start`);
+      {
+        RemoveE = document.getElementById('2');
+        console.log(RemoveE);
+        RemoveE.parentNode.removeChild(RemoveE);
 
-      $ViewList = $ViewList;
+        RemoveE = document.getElementById('1');
+        console.log(RemoveE);
+        RemoveE.parentNode.removeChild(RemoveE);
+
+        RemoveE = document.getElementById('0');
+        console.log(RemoveE);
+        RemoveE.parentNode.removeChild(RemoveE);
+      }
+      console.log(`ClearViewList End`);
+      */
+
+      TopParentView = null;
+
+      //$ViewList = $ViewList;
     }  
 
 
     function onClickedLoad1()
     {
-      ClearViewList();
+      /*
+      console.log(`Load0 Start`);
+      ClearViewList();            
+      console.log(`Load1 Start`);
+
       
+
       NewViewBox =  new ViewBox(ID, -1, 'V', '100%', '100%', 1, 2, ID.toString, 'Block' );
       $ViewList.push(NewViewBox);
 
@@ -539,15 +561,20 @@
       NewViewBox =  new ViewBox(4,  1,  'N', '100%', '50%', -1, -1, '4', 'Block');
       $ViewList.push(NewViewBox);
 
+      console.log($ViewList);
+
       TopParentView = $ViewList[0];
 
-      $ViewList = $ViewList;
+      console.log(`Load1 End`);
+      console.log(`Load0 End`);
+      */
     }
     function onClickedLoad2()
-    {
-      ClearViewList();
+    {      
     }
-    function onClickedLoad3(){}
+    function onClickedLoad3()
+    {
+    }
     function onClickedLoad4(){}
     function onClickedLoad5(){}
 
@@ -567,7 +594,8 @@
         -->        
       </header>
       <div id="idContainer" class="divContainer">
-        {#if $ViewList.length > 0}
+        <!--{#if $ViewList.length > 0}-->
+        {#if TopParentView}
           <FlexibleView bind:View={TopParentView} {ViewList}  Total_Width="100%" Total_Height="100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteParent} />
         {/if}
         <!--

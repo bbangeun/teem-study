@@ -2,7 +2,7 @@
     import { writable  } from 'svelte/store'
     import { ViewList , ViewBox } from './stores.js'
     import BoxView from './BoxView.svelte'
-    import {onMount, afterUpdate} from 'svelte'
+    import {onMount, afterUpdate,onDestroy} from 'svelte'
     import { createEventDispatcher } from "svelte";    
 
     export let View =  writable({});
@@ -40,11 +40,8 @@
             console.log(`Set Complete V2 ${View.V2}`);
         }
     } 
-
-
-
   
-   
+
     ViewList.subscribe(value => {
         console.log('====Subscribe-Start===');
         console.log(View);
@@ -65,6 +62,7 @@
 
         console.log('====Subscribe-End===');		  
     });  
+    
 
 
     /*
@@ -95,11 +93,9 @@
 
             if(View.V2 === $ViewList[i].Index){          
                 Child_V2 = $ViewList[i];
-                console.log(`Set Complete End ${View.V2}`);
+                console.log(`Set Complete V2 ${View.V2}`);
             }
         }
-
-
         console.log('----------------------------------------------');
     })
     
@@ -110,9 +106,9 @@
 
 	    console.log('----------------------------------------------');
         console.log('afterUpdate');
-        //console.log(View);  
+        console.log(View);  
         console.log(View.Index);  
-        //console.log($ViewList);  
+        console.log($ViewList);  
 
         for(let i = 0; i < $ViewList.length; i++)
         {
@@ -123,12 +119,13 @@
 
             if(View.V2 === $ViewList[i].Index){          
                 Child_V2 = $ViewList[i];
-                console.log(`Set Complete End ${View.V2}`);
+                console.log(`Set Complete V2 ${View.V2}`);
             }
         }
   
+        
         ResizeID = `R${View.Index}`;
-        console.log(ResizeID);  
+        console.log(ResizeID);         
        
         const item = document.getElementById(ResizeID);
        
@@ -136,7 +133,8 @@
         item.removeEventListener("dragend", DragProcess);        
         
         item.addEventListener("drag",    DragProcess);
-        item.addEventListener("dragend", DragProcess);      
+        item.addEventListener("dragend", DragProcess);
+             
    
 
         /*
@@ -154,6 +152,8 @@
 
         console.log('----------------------------------------------');
     })
+
+    onDestroy(async() => {() => console.log(`onDestroy ${View}`);}   );
 
     function DragProcess(e)
     {
@@ -542,27 +542,28 @@
     }  
 
 </script>
+    
+        <div id = {View.Index}
+            class="divCanvas" 
+            style= "width: {Total_Width}; height:{Total_Height}; display:{View.Display}">              
+            {#if      View.Type === 'H'}
 
-    <div id = {View.Index}
-         class="divCanvas" 
-         style= "width: {Total_Width}; height:{Total_Height}; display:{View.Display}">              
-         {#if      View.Type === 'H'}
+                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self> 
+                <div id = "R{View.Index}"  class = "divResize" style= "width: 6px; min-width: 6px; height:{Child_V1.VRatio}" draggable="true"  ></div>
+                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self>     
 
-            <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self> 
-            <div id = "R{View.Index}"  class = "divResize" style= "width: 6px; min-width: 6px; height:{Child_V1.VRatio}" draggable="true"  ></div>
-            <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self>     
+            {:else if View.Type === 'V'}
 
-         {:else if View.Type === 'V'}
-
-            <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self> 
-            <div id = "R{View.Index}" class = "divResize" style= "width:{Child_V1.HRatio}  height:6px; min-height: 6px;" draggable="true" ></div>
-            <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self>     
-         {:else}
-            <BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick}></BoxView> 
-            <!-- <BoxView bind:Index ={View.Index} on:spliteClick on:removeClick></BoxView>  -->
-          
-         {/if}
-    </div>    
+                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self> 
+                <div id = "R{View.Index}" class = "divResize" style= "width:{Child_V1.HRatio}  height:6px; min-height: 6px;" draggable="true" ></div>
+                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self>     
+            {:else}
+                <BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick}></BoxView> 
+                <!-- <BoxView bind:Index ={View.Index} on:spliteClick on:removeClick></BoxView>  -->
+            
+            {/if}
+        </div>    
+    
 
     
 
