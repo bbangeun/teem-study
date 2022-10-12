@@ -23,7 +23,7 @@
         console.log('----------------------------------------------');
         console.log('Mosaic onMount Start');
         console.log('----------------------------------------------');
-
+        /*
         const res = await fetch("http://127.0.0.1:8080/pane/1")
           .then(response => response.json())
           .then(data => {
@@ -33,8 +33,9 @@
           console.log(error);
           return [];
         });
+        */
 
-        /*
+        
         NewViewBox =  new ViewBox(ID, -1, 'H', '100%', '100%', 1, 2, ID.toString, 'inline-flex' );
         $ViewList.push(NewViewBox);
 
@@ -47,7 +48,7 @@
         $ViewList.sort(function compare(a, b) {
           return a.Index - b.Index;
         });
-        */
+       
 
         TopParentView = $ViewList[0];
 
