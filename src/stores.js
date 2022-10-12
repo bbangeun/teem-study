@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 export let unlockTiles = writable(false);
 export let showDrops = writable(false);
@@ -10,6 +10,15 @@ export let dragOrigin = writable(null);
 export let currentLayout = writable([]);
 
 export let ViewList = writable([]); //윤 추가
+
+export const apiData = writable([]);
+
+export const drinkNames = derived(apiData, ($apiData) => {
+  if ($apiData.drinks){
+    return $apiData.drinks.map(drink => drink.strDrink);
+  }
+  return [];
+});
 
 export  class  ViewBox{
     constructor(Index, PID, Type, HRatio, VRatio, V1, V2, Title, Display){
@@ -28,3 +37,4 @@ export  class  ViewBox{
      this.Display = Display;                  
    }
  }
+

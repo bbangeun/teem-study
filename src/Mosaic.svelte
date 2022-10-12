@@ -1,6 +1,7 @@
 <script>
     import { object_without_properties, to_number } from 'svelte/internal'
     import { writable } from 'svelte/store'
+    import {onMount, afterUpdate, onDestroy} from 'svelte'
     import BoxView      from './BoxView.svelte'
  
     
@@ -8,13 +9,55 @@
     
     import { ViewList , ViewBox } from './stores.js'
 
+    import { apiData, drinkNames } from './stores.js';
+
     let NewViewBox;    
 
-    let TopParentView;
+    let TopParentView = null;
+
+    let CurrentPageIndex = 0;
 
     let ID = 0;
-    //let ViewList = writable([]);  
-  
+
+    onMount(async ()=>{   
+        console.log('----------------------------------------------');
+        console.log('Mosaic onMount Start');
+        console.log('----------------------------------------------');
+
+        const res = await fetch("http://127.0.0.1:8080/pane/1")
+          .then(response => response.json())
+          .then(data => {
+          console.log(data);
+          apiData.set(data);
+        }).catch(error => {
+          console.log(error);
+          return [];
+        });
+
+        /*
+        NewViewBox =  new ViewBox(ID, -1, 'H', '100%', '100%', 1, 2, ID.toString, 'inline-flex' );
+        $ViewList.push(NewViewBox);
+
+        NewViewBox =  new ViewBox(1,  0,  'N', '40%', '100%', -1, -1, 'Index-1', 'Block');
+        $ViewList.push(NewViewBox);
+
+        NewViewBox =  new ViewBox(2,  0,  'N', '60%', '100%', -1, -1, 'Index-2', 'Block');
+        $ViewList.push(NewViewBox);
+        
+        $ViewList.sort(function compare(a, b) {
+          return a.Index - b.Index;
+        });
+        */
+
+        TopParentView = $ViewList[0];
+
+        console.log('----------------------------------------------');
+        console.log('Mosaic onMount End');
+        console.log('----------------------------------------------');
+    })
+    
+   
+    /* 
     NewViewBox =  new ViewBox(ID, -1, 'H', '100%', '100%', 1, 2, ID.toString, 'inline-flex' );
     $ViewList.push(NewViewBox);
 
@@ -24,7 +67,7 @@
     NewViewBox =  new ViewBox(2,  0,  'N', '60%', '100%', -1, -1, '2020', 'Block');
     $ViewList.push(NewViewBox);   
 
-       /* 
+      
     NewViewBox =  new ViewBox(3,  2,  'H', '100%', '50%', 5, 6, '3', 'inline-flex');
     $ViewList.push(NewViewBox);
 
@@ -47,7 +90,7 @@
     
       
 
-    TopParentView = $ViewList[0];   
+    //TopParentView = $ViewList[0];   
 
     
     /*
@@ -91,11 +134,13 @@
     */
  
 
+    /*
     $ViewList.sort(function compare(a, b) {
       return a.Index - b.Index;
     });
     
     $ViewList = $ViewList;
+    */
 
 
     /*
@@ -319,7 +364,6 @@
 
       return ResultIndex;
     }
-
     const EventRemoveChild = event => {
       console.log(`Remove Failed::Top Parent View [${event.detail}]`);
     }
@@ -534,9 +578,7 @@
       TopParentView = null;
 
       //$ViewList = $ViewList;
-    }  
-
-
+    } 
     function onClickedLoad1()
     {
       /*
@@ -569,14 +611,11 @@
       console.log(`Load0 End`);
       */
     }
-    function onClickedLoad2()
-    {      
-    }
-    function onClickedLoad3()
-    {
-    }
+    function onClickedLoad2(){}    
+    function onClickedLoad3(){}
     function onClickedLoad4(){}
     function onClickedLoad5(){}
+    function onClickedSave(){}
 
     </script>
 
@@ -587,6 +626,7 @@
         <button class="btnLoad"  type="button" on:click="{onClickedLoad3}">3</button>
         <button class="btnLoad"  type="button" on:click="{onClickedLoad4}">4</button>
         <button class="btnLoad"  type="button" on:click="{onClickedLoad5}">5</button>
+        <button class="btnSave"  type="button" on:click="{onClickedSave}">저장</button>
 
         <button class="btnApply" type="button" on:click="{onClickedAdd}">추가</button> 
         <!--
@@ -662,9 +702,15 @@
         margin:  10px;
         padding: 0px;
         text-align: center;
-        font-size: 14px;   
-       
-          
+        font-size: 14px;  
+      }
+      .btnSave{            
+        width:   80px;       
+        height:  calc(100% -10px);        
+        margin:  10px;
+        padding: 0px;
+        text-align: center;
+        font-size: 14px;  
       }
 
       
