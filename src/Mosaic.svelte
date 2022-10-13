@@ -2,8 +2,7 @@
     import { object_without_properties, to_number } from 'svelte/internal'
     import { writable } from 'svelte/store'
     import {onMount, afterUpdate, onDestroy} from 'svelte'
-    import BoxView      from './BoxView.svelte'
- 
+    import BoxView      from './BoxView.svelte' 
     
     import FlexibleView from './FlexibleView.svelte'    
     
@@ -11,28 +10,32 @@
 
     import { apiData, drinkNames } from './stores.js';
 
+    const API_LOAD_URL = "http://127.0.0.1:8887/pane/" //"http://127.0.0.1:8887/pane/1"
+    const API_SAVE_URL = "http://127.0.0.1:8887/pane/" //"http://127.0.0.1:8887/pane/1"
+
     let NewViewBox;    
 
     let TopParentView = null;
 
-    let CurrentPageIndex = 0;
+    let CurrentPage = 0;
 
     let ID = 0;
 
-    let LoadParentArray = [];
-    let LoadChildArray = [];
+    async function GetPageInfo(Page){
 
-    onMount(async ()=>{   
-        console.log('----------------------------------------------');
-        console.log('Mosaic onMount Start');
-        console.log('----------------------------------------------');
-      
-        const res = await fetch("http://127.0.0.1:8887/pane/1")
+      let LoadParentArray = [];
+      let LoadChildArray  = [];
+      let PanelView = null; 
+      let Result = true;
+    
+      console.log('----------------------------------------------');
+      console.log('GetPageInfo Start : [' + Page + ']');
+      console.log('----------------------------------------------');
+      const res = await fetch(API_LOAD_URL + Page)
           .then(response => response.json())
-          .then(data => {
+          .then(data => {          
           
-          console.log('=====================================');
-          console.log(data.page_id);
+          console.log("Page : "+ data.page_id);
           console.log(data.structure);
 
           LoadParentArray = data.structure.split('$#$');
@@ -41,136 +44,89 @@
           {
             LoadChildArray = LoadParentArray[i].split(',');
             console.log(LoadChildArray);
-            NewViewBox = new ViewBox(LoadChildArray[0],
-                                     LoadChildArray[1],
-                                     LoadChildArray[2],
-                                     LoadChildArray[3],
-                                     LoadChildArray[4],
-                                     LoadChildArray[5],
-                                     LoadChildArray[6],
-                                     LoadChildArray[0],
-                                     LoadChildArray[7]);
-            console.log(NewViewBox);
+            PanelView = new ViewBox(LoadChildArray[0],
+                                    LoadChildArray[1],
+                                    LoadChildArray[2],
+                                    LoadChildArray[3],
+                                    LoadChildArray[4],
+                                    LoadChildArray[5],
+                                    LoadChildArray[6],
+                                    LoadChildArray[0],
+                                    LoadChildArray[7]);
+            console.log(PanelView);
 
-            $ViewList.push(NewViewBox);
-          }
-          console.log('=====================================');
+            $ViewList.push(PanelView);
+          }          
           apiData.set(data);
+          CurrentPage = data.page_id;
+          Result = true;
         }).catch(error => {
           console.log(error);
-          return [];
-        });
+          Result = false;
+        });    
+
+      console.log('----------------------------------------------');
+      console.log('GetPageInfo End : [' + Page + ']');
+      console.log('----------------------------------------------');
+
+      return Result;
+    }
+    function SetDefaultPage()
+    {
+      let View = null; 
+
+      ClearViewList(); 
+
+      View =  new ViewBox(0, -1, 'H', '100%', '100%', 1,  2,  'default-0', 'inline-flex' );
+      $ViewList.push(View);
+
+      View =  new ViewBox(1,  0,  'N', '40%', '100%', -1, -1, 'default-1', 'Block');
+      $ViewList.push(View);
+
+      View =  new ViewBox(2,  0,  'N', '60%', '100%', -1, -1, 'default-2', 'Block');
+      $ViewList.push(View);
+
+      $ViewList.sort( function compare(a, b) { return a.Index - b.Index; });
+
+      CurrentPage = 0;
+    }
+    async function LoadPage(Page){
+
+      ClearViewList(); 
+
+      if(Page > 0 )
+      {
+        let Result = await GetPageInfo(Page);
+
+        if(Result === true){
+          console.log('LoadPage Sucessed[' + Page + ']');
+        }else{
+          console.log('LoadPage Faield[' + Page + ']' + 'So Default Set');
+          SetDefaultPage();
+        }
+      }
+      else
+      {
+        SetDefaultPage();
+      }
+
+      TopParentView = $ViewList[0];
+
+      SetButtonColor(CurrentPage);
+    }
+    onMount(async ()=>{
+
+        console.log('----------------------------------------------');
+        console.log('Mosaic onMount Start');
+        console.log('----------------------------------------------');
       
-
-        /*
-        NewViewBox =  new ViewBox(ID, -1, 'H', '100%', '100%', 1, 2, ID.toString, 'inline-flex' );
-        $ViewList.push(NewViewBox);
-
-        NewViewBox =  new ViewBox(1,  0,  'N', '40%', '100%', -1, -1, 'Index-1', 'Block');
-        $ViewList.push(NewViewBox);
-
-        NewViewBox =  new ViewBox(2,  0,  'N', '60%', '100%', -1, -1, 'Index-2', 'Block');
-        $ViewList.push(NewViewBox);
-        */
-        
-        $ViewList.sort(function compare(a, b) {
-          return a.Index - b.Index;
-        });
-       
-
-        TopParentView = $ViewList[0];
+        LoadPage("1");
 
         console.log('----------------------------------------------');
         console.log('Mosaic onMount End');
         console.log('----------------------------------------------');
     })
-    
    
-    /* 
-    NewViewBox =  new ViewBox(ID, -1, 'H', '100%', '100%', 1, 2, ID.toString, 'inline-flex' );
-    $ViewList.push(NewViewBox);
-
-    NewViewBox =  new ViewBox(1,  0,  'N', '40%', '100%', -1, -1, '1010', 'Block');
-    $ViewList.push(NewViewBox);
-
-    NewViewBox =  new ViewBox(2,  0,  'N', '60%', '100%', -1, -1, '2020', 'Block');
-    $ViewList.push(NewViewBox);   
-
-      
-    NewViewBox =  new ViewBox(3,  2,  'H', '100%', '50%', 5, 6, '3', 'inline-flex');
-    $ViewList.push(NewViewBox);
-
-    NewViewBox =  new ViewBox(4,  2,  'N', '100%', '50%', -1, -1, '4', 'Block');
-    $ViewList.push(NewViewBox);  
-
-  
-    NewViewBox =  new ViewBox(5,  3,  'N', '70%', '100%', -1, -1, '5');
-    $ViewList.push(NewViewBox);        
-
-    NewViewBox =  new ViewBox(6,  3,  'N', '30%', '100%', -1, -1, '6');
-    $ViewList.push(NewViewBox);  
-    
-    NewViewBox =  new ViewBox(7,  4,  'N', '100%', '50%', -1, -1, '5');
-    $ViewList.push(NewViewBox);        
-
-    NewViewBox =  new ViewBox(8,  4,  'N', '100%', '50%', -1, -1, '6');
-    $ViewList.push(NewViewBox);  
-    */
-    
-      
-
-    //TopParentView = $ViewList[0];   
-
-    
-    /*
-    NewViewBox =  new ViewBox(1,  0,  'H', '60%', '100%', 3, 4, '1');
-    $ViewList.push(NewViewBox);
-
-    NewViewBox =  new ViewBox(2,  0,  'V', '40%', '100%', 5, 6, '2');c
-    $ViewList.push(NewViewBox);    
-    
-      
-    NewViewBox =  new ViewBox(3,  1,  'N', '50%', '100%', -1, -1, '3');
-    $ViewList.push(NewViewBox);
-
-    NewViewBox =  new ViewBox(4,  1,  'N', '50%', '100%', -1, -1, '4');
-    $ViewList.push(NewViewBox);       
-      
-    NewViewBox =  new ViewBox(5,  2,  'H', '100%', '50%', 7, 8, '5');
-    $ViewList.push(NewViewBox);        
-
-    NewViewBox =  new ViewBox(6,  2,  'V', '100%', '50%', 9, 10, '6');
-    $ViewList.push(NewViewBox);     
-
-    NewViewBox =  new ViewBox(7,  5,  'N', '50%', '100%', -1, -1, '7');
-    $ViewList.push(NewViewBox);        
-
-    NewViewBox =  new ViewBox(8,  5,  'V', '50%', '100%', 11, 12, '8');
-    $ViewList.push(NewViewBox);     
-
-    NewViewBox =  new ViewBox(9,  5,  'N', '100%', '50%', -1, -1, '9');
-    $ViewList.push(NewViewBox);   
-
-    NewViewBox =  new ViewBox(10,  5,  'N', '100%', '50%', -1, -1, '10');
-    $ViewList.push(NewViewBox);
-
-    NewViewBox =  new ViewBox(11,  8,  'N', '100%', '70%', -1, -1, '11');
-    $ViewList.push(NewViewBox);      
-    
-
-    NewViewBox =  new ViewBox(12,  8,  'N', '100%', '30%', -1, -1, '12');
-    $ViewList.push(NewViewBox);   
-    */
- 
-
-    /*
-    $ViewList.sort(function compare(a, b) {
-      return a.Index - b.Index;
-    });
-    
-    $ViewList = $ViewList;
-    */
-
 
     /*
     function onClickedAdd () {
@@ -576,7 +532,7 @@
         View = $ViewList[i];
         //View = null;
         console.log(View);
-        //$ViewList.splice(i, 1);
+        $ViewList.splice(i, 1);
         Object.freeze(View);
       }
 
@@ -607,108 +563,93 @@
       TopParentView = null;
 
       //$ViewList = $ViewList;
-    } 
-    function onClickedLoad1()
-    {
-      /*
-      console.log(`Load0 Start`);
-      ClearViewList();            
-      console.log(`Load1 Start`);
-
-      
-
-      NewViewBox =  new ViewBox(ID, -1, 'V', '100%', '100%', 1, 2, ID.toString, 'Block' );
-      $ViewList.push(NewViewBox);
-
-      NewViewBox =  new ViewBox(1,  0,  'V', '100%', '40%', 3,  4, '1', 'Block');
-      $ViewList.push(NewViewBox);
-
-      NewViewBox =  new ViewBox(2,  0,  'N', '100%', '60%', -1, -1,  '2', 'Block');
-      $ViewList.push(NewViewBox);   
-       
-      NewViewBox =  new ViewBox(3,  1,  'N', '100%', '50%', -1, -1, '3', 'Block');
-      $ViewList.push(NewViewBox);
-
-      NewViewBox =  new ViewBox(4,  1,  'N', '100%', '50%', -1, -1, '4', 'Block');
-      $ViewList.push(NewViewBox);
-
-      console.log($ViewList);
-
-      TopParentView = $ViewList[0];
-
-      console.log(`Load1 End`);
-      console.log(`Load0 End`);
-      */
     }
-    function onClickedLoad2(){ ClearViewList();     }    
-    async function onClickedLoad3()
+    function SetButtonColor(Page)
     {  
-        console.log('----------------------------------------------');
-        console.log('onClickedLoad3');
-        console.log('----------------------------------------------');
-      
-        const res = await fetch("http://127.0.0.1:8887/pane/1")
-          .then(response => response.json())
-          .then(data => {
-          
-          console.log('=====================================');
-          console.log(data.page_id);
-          console.log(data.structure);
+      let PageButton;
+      let SeletedButtonID;
+      let LoopButtonID;
 
-          LoadParentArray = data.structure.split('$#$');
-          console.log(LoadParentArray);
-          for(let i = 0; i < LoadParentArray.length; i++ )
-          {
-            LoadChildArray = LoadParentArray[i].split(',');
-            console.log(LoadChildArray);
-            NewViewBox = new ViewBox(LoadChildArray[0],
-                                     LoadChildArray[1],
-                                     LoadChildArray[2],
-                                     LoadChildArray[3],
-                                     LoadChildArray[4],
-                                     LoadChildArray[5],
-                                     LoadChildArray[6],
-                                     LoadChildArray[0],
-                                     LoadChildArray[7]);
-            console.log(NewViewBox);
+      SeletedButtonID   = 'b'+ Page;
 
-            $ViewList.push(NewViewBox);
-          }
-          console.log('=====================================');
-          apiData.set(data);
-        }).catch(error => {
-          console.log(error);
-          return [];
-        });
-      
+      for(let i = 0; i < 6; i++)
+      {
+        LoopButtonID   = 'b'+i.toString();
+        PageButton = document.getElementById(LoopButtonID);
 
-     
-        
-    
+        if(PageButton.id === SeletedButtonID)
+        {
+          PageButton.style.background = "red";
+        }
+        else
+        {          
+          PageButton.style.background = "green";
+        }
+      }
+    }      
+    function onClickedDefault(){ LoadPage("0"); } 
+    function onClickedLoad1(){ LoadPage("1"); }
+    function onClickedLoad2(){ LoadPage("2"); }    
+    function onClickedLoad3(){ LoadPage("3"); }
+    function onClickedLoad4(){ LoadPage("4"); }
+    function onClickedLoad5(){ LoadPage("5"); }
+    async function onClickedSave() 
+    {
+      let Value = '';
+      let View;
+      let Length = $ViewList.length; 
+      let result = null;
 
-        TopParentView = $ViewList[0];
+      console.log('----------------------------------------------');
+      console.log('Mosaic Save Start');
+      console.log('----------------------------------------------');
 
-        console.log('----------------------------------------------');
-        console.log('Mosaic onMount End');
-        console.log('----------------------------------------------');
+      for(let i=0; i<Length; i++)
+      {
+        View = $ViewList[i];
+        Value = Value + View.GetSaveParam();
 
+        if(i < Length - 1)
+        {
+          Value = Value + '$#$';
+        } 
+      }
+
+      console.log('[' + CurrentPage + ']:['+ Value +']');
+
+      const res = await fetch('https://httpbin.org/post', {
+      method: 'POST',
+      body: JSON.stringify({
+        CurrentPage,
+        Value
+      })
+      })
+
+      const json = await res.json()
+      result = JSON.stringify(json)
+      console.log(result);
+      console.log('----------------------------------------------');
+      console.log('Mosaic Save End');
+      console.log('----------------------------------------------');
     }
-    function onClickedLoad4(){}
-    function onClickedLoad5(){}
-    function onClickedSave(){}
 
     </script>
 
     <div class=divCanvas>
       <header class="hdTop">
-        <button class="btnLoad"  type="button" on:click="{onClickedLoad1}">1</button>
-        <button class="btnLoad"  type="button" on:click="{onClickedLoad2}">2</button>
-        <button class="btnLoad"  type="button" on:click="{onClickedLoad3}">3</button>
-        <button class="btnLoad"  type="button" on:click="{onClickedLoad4}">4</button>
-        <button class="btnLoad"  type="button" on:click="{onClickedLoad5}">5</button>
-        <button class="btnSave"  type="button" on:click="{onClickedSave}">저장</button>
+        <!--
+        <label class="labelIndex">{CurrentPage} </label>
+        -->
+        <button id="b0" class="btnDefault" type="button" on:click="{onClickedDefault}">Default</button>
+        <button id="b1" class="btnLoad"    type="button" on:click="{onClickedLoad1}">1</button>
+        <button id="b2" class="btnLoad"    type="button" on:click="{onClickedLoad2}">2</button>
+        <button id="b3" class="btnLoad"    type="button" on:click="{onClickedLoad3}">3</button>
+        <button id="b4" class="btnLoad"    type="button" on:click="{onClickedLoad4}">4</button>
+        <button id="b5" class="btnLoad"    type="button" on:click="{onClickedLoad5}">5</button>
+        <button class="btnSave"    type="button" on:click="{onClickedSave}">저장</button>
 
-        <button class="btnApply" type="button" on:click="{onClickedAdd}">추가</button> 
+        <button class="btnApply" type="button" on:click="{onClickedAdd}">추가</button>
+        
         <!--
         <button class="btnApply" type="button" on:click="{onClickedRefresh}">삭제</button>
         -->        
@@ -775,14 +716,23 @@
         padding: 0px; 
      
       }
-
+      .btnDefault{            
+        width:   60px;       
+        height:  calc(100% -10px);        
+        margin:  10px;
+        padding: 0px;
+        text-align: center;
+        font-size: 14px;
+        color: white;  
+      }
       .btnLoad{            
         width:   40px;       
         height:  calc(100% -10px);        
         margin:  10px;
         padding: 0px;
         text-align: center;
-        font-size: 14px;  
+        font-size: 14px;
+        color: white;  
       }
       .btnSave{            
         width:   80px;       
@@ -791,6 +741,16 @@
         padding: 0px;
         text-align: center;
         font-size: 14px;  
+        color: white;
+        background: blue;
+      }
+      .labelIndex{
+        width:   80px;       
+        height:  calc(100% -10px);        
+        margin:  10px;
+        padding: 0px;
+        text-align: center;
+        font-size: 14px;
       }
 
       

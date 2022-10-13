@@ -34,7 +34,11 @@ export  class  ViewBox{
      this.VRealRatio = "calc({VRatio} - 10px)"  
      this.Offset = (((V1 > 0) && (V2 > 0)) || (PID > 0)) ? '10px' : '0px';
      //this.Display = (this.Type === 'H') ? 'inline-flex' : 'Block';
-     this.Display = Display;                  
+     this.Display = Display;     
+     this.Param ='';             
+   }
+   GetSaveParam(){
+    return this.Index+','+this.PID+','+this.Type+','+this.HRatio+','+this.VRatio+','+this.V1+','+this.V2+','+this.Display;
    }
  }
 

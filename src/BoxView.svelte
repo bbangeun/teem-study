@@ -22,12 +22,12 @@
 
 <!--{#if LType === 'H'}-->
     <!-- <div class=divCanvas style="width:{Ratio}">     -->
-    <div class=divCanvas >     
-        <header class="hdTop">            
+    <div class=divCanvas>     
+        <header class="hdTop" >            
             <button class="btnApply" type="button" on:click="{onClickedSplite}">분리</button> 
             <button class="btnApply" type="button" on:click="{onClickedRemove}">삭제</button>         
         </header>       
-        <div id="idContainer" class="divCContainer">{Index}</div>               
+        <div id="idContainer" class="divCContainer">{Index} </div>               
     </div>
 <!--{/if}-->
 
