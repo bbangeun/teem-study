@@ -4,7 +4,7 @@
     import {onMount, afterUpdate, onDestroy} from 'svelte'
     import BoxView      from './BoxView.svelte' 
     
-    import FlexibleView from './FlexibleView.svelte'    
+    import FlexibleView from './FlexibleView_test.svelte'    
     
     import { ViewList , ViewBox } from './stores.js'
 
@@ -125,7 +125,8 @@
         console.log('----------------------------------------------');
         console.log('Mosaic onMount End');
         console.log('----------------------------------------------');
-    })
+    })   
+
     
     function onClickedAdd () {
 
@@ -482,11 +483,15 @@
         Object.freeze(View);
       }
 
-      $ViewList = [];      
+      $ViewList = [];
 
-      console.log($ViewList);     
+      //$ViewList = $ViewList;
+
+      //console.log($ViewList);     
 
       TopParentView = null;
+
+      //$ViewList = $ViewList;
     }
     function SetButtonColor(Page)
     {  
@@ -512,46 +517,40 @@
       }
     }      
     function onClickedDefault(){ LoadPage("0"); } 
-    function onClickedLoad1(){ LoadPage("1"); }
+    function onClickedLoad1()
+    { 
+      let View = null;
+      
+      ClearViewList();
+
+      View =  new ViewBox(0, -1, 'V', '100%', '100%', 1,  2,  'change-0', 'block' );
+      $ViewList.push(View);
+
+      View =  new ViewBox(1,  0,  'N', '100%', '40%', -1, -1, 'change-1', 'Block');
+      $ViewList.push(View);
+
+      View =  new ViewBox(2,  0,  'N', '100%', '60%', -1, -1, 'change-2', 'Block');
+      $ViewList.push(View);
+
+      $ViewList.sort( function compare(a, b) { return a.Index - b.Index; });
+
+      
+      TopParentView = $ViewList[0];
+      console.log(TopParentView);
+
+      CurrentPage = 0;
+    }
     function onClickedLoad2(){ LoadPage("2"); }    
     function onClickedLoad3(){ LoadPage("3"); }
     function onClickedLoad4(){ LoadPage("4"); }
     function onClickedLoad5(){ LoadPage("5"); }
     async function onClickedSave() 
     {
-      let Value = '';
-      let View;
-      let Length = $ViewList.length; 
-      let result = null;
-
       console.log('----------------------------------------------');
       console.log('Mosaic Save Start');
       console.log('----------------------------------------------');
 
-      for(let i=0; i<Length; i++)
-      {
-        View = $ViewList[i];
-        Value = Value + View.GetSaveParam();
-
-        if(i < Length - 1)
-        {
-          Value = Value + '$#$';
-        } 
-      }
-
-      console.log('[' + CurrentPage + ']:['+ Value +']');
-
-      const res = await fetch('https://httpbin.org/post', {
-      method: 'POST',
-      body: JSON.stringify({
-        CurrentPage,
-        Value
-      })
-      })
-
-      const json = await res.json()
-      result = JSON.stringify(json)
-      console.log(result);
+     
       console.log('----------------------------------------------');
       console.log('Mosaic Save End');
       console.log('----------------------------------------------');
@@ -560,22 +559,29 @@
     </script>
 
     <div class=divCanvas>
-      <header class="hdTop">        
+      <header class="hdTop">
+        <!--
+        <label class="labelIndex">{CurrentPage} </label>
+        -->
         <button id="b0" class="btnDefault" type="button" on:click="{onClickedDefault}">Default</button>
         <button id="b1" class="btnLoad"    type="button" on:click="{onClickedLoad1}">1</button>
         <button id="b2" class="btnLoad"    type="button" on:click="{onClickedLoad2}">2</button>
         <button id="b3" class="btnLoad"    type="button" on:click="{onClickedLoad3}">3</button>
         <button id="b4" class="btnLoad"    type="button" on:click="{onClickedLoad4}">4</button>
         <button id="b5" class="btnLoad"    type="button" on:click="{onClickedLoad5}">5</button>
-        <button class="btnSave"    type="button" on:click="{onClickedSave}">저장</button>
+        <button class="btnSave" type="button" on:click="{onClickedSave}">저장</button>
 
-        <button class="btnApply" type="button" on:click="{onClickedAdd}">추가</button>        
-                
+        <button class="btnApply" type="button" on:click="{onClickedAdd}">추가</button>
+        
+        <!--
+        <button class="btnApply" type="button" on:click="{onClickedRefresh}">삭제</button>
+        -->        
       </header>
-      <div id="idContainer" class="divContainer">        
+      <div id="idContainer" class="divContainer">
+        <!--{#if $ViewList.length > 0}-->
         {#if TopParentView}
           <FlexibleView bind:View={TopParentView} {ViewList}  Total_Width="100%" Total_Height="100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteParent} />
-        {/if}        
+        {/if}
       </div>
     </div>
 

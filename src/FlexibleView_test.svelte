@@ -2,13 +2,10 @@
     import { writable  } from 'svelte/store'
     import { ViewList , ViewBox } from './stores.js'
     import BoxView from './BoxView.svelte'
-    import {onMount, beforeUpdate, afterUpdate, onDestroy} from 'svelte'
+    import {onMount, beforeUpdate, afterUpdate,onDestroy} from 'svelte'
     import { createEventDispatcher } from "svelte";    
-    import { object_without_properties } from 'svelte/internal'
 
     export let View =  writable({});
-    //export let View = {};
-    //export let ViewList;
 
     export let Child_V1 = {};
     export let Child_V2 = {};  
@@ -16,28 +13,19 @@
     export let Total_Width  = '0%';
     export let Total_Height = '0%';
 
-    let TempView = {};
-    let IsDragStart = false;
-
     const dispatchChildRemove = createEventDispatcher();
     const dispatchChildParent = createEventDispatcher();
 
     const dispatchSpliteChild  = createEventDispatcher();
     const dispatchSpliteParent = createEventDispatcher();
 
-    const dispatchDragStart    = createEventDispatcher();
-    const dispatchDragEnd      = createEventDispatcher();
-
-    const dispatchDrop          = createEventDispatcher();
-
-
-    
     console.log('----------------------------------------------');
-    console.log('View Init Start');    
-    console.log('----------------------------------------------');
-    console.log(View);  
+    console.log('View Init Start');
+    console.log('----------------------------------------------');    
+    console.log(View);
     console.log(View.Index);
     console.log('----------------------------------------------');
+
     for(let i = 0; i < $ViewList.length; i++)
     {
         if(View.V1 === $ViewList[i].Index){            
@@ -50,21 +38,101 @@
             console.log(`Set Complete V2 ${View.V2}`);
         }
     }
-    console.log('----------------------------------------------');
-    console.log('View Init End');    
-    console.log('----------------------------------------------');
+    /*
+    ViewList.subscribe(value => {
+        console.log('====Subscribe-Start===');
+        console.log(View);
+        console.log(value);        
+        
+        for(let i = 0; i < $ViewList.length; i++)
+        {
+            if(View.V1 === $ViewList[i].Index){            
+                Child_V1 = $ViewList[i];
+                console.log(`Set Complete V1 ${View.V1}`);                
+            }
 
-    /*=======================================================================*/
-    // Function Start 
-    /*=======================================================================*/
+            if(View.V2 === $ViewList[i].Index){          
+                Child_V2 = $ViewList[i];
+                console.log(`Set Complete End ${View.V2}`);
+            }
+        }
+
+        console.log('====Subscribe-End===');		  
+    });    
+    */
+    /*    
+    onMount(()=>{   
+        console.log('----------------------------------------------');
+        console.log('onMount');
+        console.log(View);  
+        console.log(View.Index);  
+        console.log($ViewList);       
+        
+        for(let i = 0; i < $ViewList.length; i++)
+        {
+            if(View.V1 === $ViewList[i].Index){            
+                Child_V1 = $ViewList[i];
+                console.log(`Set Complete V1 ${View.V1}`);                
+            }
+
+            if(View.V2 === $ViewList[i].Index){          
+                Child_V2 = $ViewList[i];
+                console.log(`Set Complete V2 ${View.V2}`);
+            }
+        }
+        console.log('----------------------------------------------');
+    })
+    */
+ 
+    onMount(()=>{   
+
+        let ResizeID;
+        let ResizeEM;
+
+        console.log('----------------------------------------------');
+        console.log('OnMount Start ');
+        console.log('----------------------------------------------');
+        console.log(View);  
+        console.log(View.Index);
+
+        console.log('----------------------------------------------');
+        console.log('OnMount Start ');
+        console.log('----------------------------------------------');
+    })
+  
+   /*
+    afterUpdate(async() => {
+        console.log('----------------------------------------------');
+        console.log('AfterUpdate Start ');
+        console.log('----------------------------------------------');
+        console.log(View);  
+        console.log(View.Index);
+        for(let i = 0; i < $ViewList.length; i++)
+        {
+            if(View.V1 === $ViewList[i].Index){            
+                Child_V1 = $ViewList[i];
+                console.log(`AfterUpdate Set Complete V1 ${View.V1}`);                
+            }
+
+            if(View.V2 === $ViewList[i].Index){          
+                Child_V2 = $ViewList[i];
+                console.log(`AfterUpdate Set Complete End ${View.V2}`);
+            }
+        }
+        console.log('----------------------------------------------');
+        console.log('AfterUpdate Start ');
+        console.log('----------------------------------------------');     
+    })
+    */
     beforeUpdate(async() => {
 
-        let Resize_Index, Resize_Element;        
+        let ResizeID;
+        let ResizeEM;
 
         console.log('----------------------------------------------');
         console.log('beforeUpdate Start ');
         console.log('----------------------------------------------');
-
+        
         console.log(View);  
         console.log(View.Index);
         for(let i = 0; i < $ViewList.length; i++)
@@ -79,26 +147,70 @@
                 console.log(`beforeUpdate Set Complete V2 ${View.V2}`);
             }
         }
-
-        Resize_Index = `R${View.Index}`;
-        console.log(Resize_Index); 
-
-        Resize_Element = document.getElementById(Resize_Index);
-        if(Resize_Element)
+        
+        ResizeID = `R${View.Index}`;
+        console.log(ResizeID); 
+        
+        const item = document.getElementById(ResizeID);
+        if(item)
         {
-            Resize_Element.removeEventListener("drag",    DragProcess);
-            Resize_Element.removeEventListener("dragend", DragProcess);        
+            item.removeEventListener("drag",    DragProcess);
+            item.removeEventListener("dragend", DragProcess);        
 
-            Resize_Element.addEventListener("drag",       DragProcess);
-            Resize_Element.addEventListener("dragend",    DragProcess);            
+            item.addEventListener("drag",       DragProcess);
+            item.addEventListener("dragend",    DragProcess);            
         }
-        console.log(Resize_Element);
+        console.log(item);
 
         console.log('----------------------------------------------');
         console.log('beforeUpdate End ');
         console.log('----------------------------------------------');     
     })
+    
+    const ReSizeElement = null
+
+    /*
+    afterUpdate(async() => {
+        let ResizeID = '';
+
+	    console.log('----------------------------------------------');
+        console.log('afterUpdate');
+        console.log(View);  
+        console.log(View.Index);  
+        console.log($ViewList);  
+
+        for(let i = 0; i < $ViewList.length; i++)
+        {
+            if(View.V1 === $ViewList[i].Index){            
+                Child_V1 = $ViewList[i];
+                console.log(`Set Complete V1 ${View.V1}`);                
+            }
+
+            if(View.V2 === $ViewList[i].Index){          
+                Child_V2 = $ViewList[i];
+                console.log(`Set Complete V2 ${View.V2}`);
+            }
+        }
+  
+        
+        ResizeID = `R${View.Index}`;
+        console.log(ResizeID);         
+       
+        const item = document.getElementById(ResizeID);
+       
+        item.removeEventListener("drag", DragProcess);
+        item.removeEventListener("dragend", DragProcess);        
+        
+        item.addEventListener("drag",    DragProcess);
+        item.addEventListener("dragend", DragProcess);
+ 
+
+        console.log('----------------------------------------------');
+    })
+    */
+
     onDestroy(async() => {() => console.log(`onDestroy ${View}`);}   );
+
     function DragProcess(e)
     {
         let ParentElement;
@@ -116,7 +228,9 @@
         let V1VRatio, V2VRatio;
         
 
-        let V1_Height, V2_Height;     
+        let V1_Height, V2_Height;
+
+     
 
         ParentElement = document.getElementById(View.Index);   
         Element = document.getElementById(`R${View.Index}`);
@@ -188,8 +302,12 @@
             console.log(V1_Height,  V2_Height);
             console.log(V1VRatio+'%', V2VRatio+'%');
         }
+
+        
+
         console.log('----------------------------------------------');
-    }
+    }    
+
     function GetViewFromList(Index){
       let ResultView  = {};
 
@@ -254,7 +372,7 @@
             }
         }
 
-       c
+        Object.freeze(RemovedView);
         Object.freeze(ParentView);
 
         for(let i = 0; i < $ViewList.length; i++)
@@ -361,8 +479,12 @@
     }    
     const removeButtonClick = event => {
         dispatchChildRemove('RemoveChild', event.detail);
-    }   
+    }  
+ 
     const EventSpliteParent = event => {
+        
+      
+
         console.log(`Parent::SpliteParent End [${event.detail}] V1:${View.V1} V2:${View.V2}`);   
     }  
     function SpliteChildView(Index){
@@ -455,186 +577,46 @@
 
         console.log($ViewList);
         console.log(`Child::Splite End [${Index}] V:${View.Index} V1:${View.V1} V2:${View.V2}`);
-    } 
+    }
     const EventSpliteChild = event => {   
         SpliteChildView(event.detail);        
-    }    
+    }
     const spliteButtonClick = event => {       
         console.log(`spliteButtonClick ${event.detail}`);
         console.log(View);
         
         dispatchSpliteChild('SpliteChild', event.detail);
-    }  
-    const EventDragStart = (event) => {  
+    } 
 
-        console.log('EventDragStart');
+    console.log('----------------------------------------------');
+    console.log('View Init End');
+    console.log('----------------------------------------------');    
 
-        //dispatchChildRemove('RemoveChild', event.detail);
-        
-        
-        let MoveView;
-
-        let MoveElement, ResizeElement;   
-        
-        console.log('EventDragStart');
-
-        MoveView = GetViewFromList(event.detail);
-
-        MoveElement   = document.getElementById(MoveView.Index);
-        ResizeElement = document.getElementById(`R${View.Index}`);
-
-        //Child_V2.HRatio = '40%';
-        MoveElement.style.display   = 'none';  
-        ResizeElement.style.display = 'none';          
-
-        console.log(TempView); 
-          
-    }
-    const EventDrop = (event) => {
-        let MoveView;
-
-        let MoveElement, ResizeElement;   
-
-        console.log('EventDrop');
-
-        MoveView = GetViewFromList(event.detail);
-
-        MoveElement   = document.getElementById(MoveView.Index);
-        ResizeElement = document.getElementById(`R${View.Index}`);
-
-        MoveView.HRatio = '30%';
-        //MoveElement.style.display = 'block';  
-        ResizeElement.style.display = 'block';          
-
-        console.log(TempView);
-    }
-    const EventDragEnd = (event) => {
-        let MoveView;
-
-        let MoveElement, ResizeElement;   
-
-        console.log('EventDragEnd');
-
-        MoveView = GetViewFromList(event.detail);
-
-        MoveElement   = document.getElementById(MoveView.Index);
-        ResizeElement = document.getElementById(`R${View.Index}`);
-
-        MoveView.HRatio = '30%';
-
-        MoveElement.style.display = 'block';  
-        ResizeElement.style.display = 'block';          
-
-        console.log(TempView);
-    }
-    const EventDialogDrag = event => {    
-        
-        /*
-        let MoveElement, ResizeElement;   
-        let MoveView = GetViewFromList(View.Index);
-
-        MoveElement   = document.getElementById(MoveView.Index);
-
-        let shiftX = event.clientX - MoveElement.getBoundingClientRect().left;
-        let shiftY = event.clientY - MoveElement.getBoundingClientRect().top;
-        */
-
-     
-
-        if(event.detail.type === "dragstart")
-        {
-            /*
-            console.log('dragStart');
-
-
-            MoveElement.style.position = 'absolute';
-            MoveElement.style.zIndex = '1000';
-            document.body.append(MoveElement);
-
-            console.log('dragEnd');
-            */
-
-          
-
-          
-            if(IsDragStart===false)
-            {
-                IsDragStart=true;
-            }  
-         
-            
-            //dispatchDragStart('EventDragStart', View.Index);
-            //dispatchChildRemove('RemoveChild', View.Index);              
-        }   
-        else if(event.detail.type === "drag")
-        {
-            
-            /*
-            console.log('drag');
-            MoveElement.style.left = event.detail.pageX - MoveElement.offsetWidth  / 2 + 'px';
-            MoveElement.style.top  = event.detail.pageY - MoveElement.offsetHeight / 2 + 'px';
-            */
-         
-            //MoveElement.style.left ='500px';
-            //MoveElement.style.top  = '500px';
-           
-          
-            if(IsDragStart)
-            {
-                IsDragStart = false;
-                dispatchChildRemove('RemoveChild', View.Index);
-            }
-            else
-            {   
-                console.log(`EventDrag${View.Index}`);             
-            }
-      
-         
-            //console.log('EventDrag');
-      
-        }
-        /*
-        else if(event.detail.type === "drop")
-        {
-            console.log('Eventdrop');
-
-            //dispatchDrop('EventDrop', View.Index);
-        }
-        else if(event.detail.type === "dragend")
-        {
-            console.log(`Eventend${View.Index}`);
-            console.log($ViewList);
-            //dispatchDragEnd('Eventend', View.Index);
-        }  
-        else
-        {
-            console.log('Process::Drag Elese');
-        }
-        */
-   
-    }
-    
-    /*=======================================================================*/
-    // Function end 
-    /*=======================================================================*/    
 </script>
-    {#if View}
+        {#if View}    
         <div id = {View.Index}
             class="divCanvas" 
             style= "width: {Total_Width}; height:{Total_Height}; display:{View.Display}">              
             {#if      View.Type === 'H'}
-                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} > </svelte:self> 
+
+                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self> 
                 <div id = "R{View.Index}"  class = "divResize" style= "width: 6px; min-width: 6px; height:{Child_V1.VRatio}" draggable="true"  ></div>
-                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} ></svelte:self>    
+                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self>     
+
             {:else if View.Type === 'V'}
-                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} ></svelte:self> 
+
+                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self> 
                 <div id = "R{View.Index}" class = "divResize" style= "width:{Child_V1.HRatio}  height:6px; min-height: 6px;" draggable="true" ></div>
-                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} ></svelte:self>     
+                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self>     
             {:else}
-                <BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick} on:EventDialogDrag={EventDialogDrag}></BoxView>
+                <BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick} ></BoxView> 
+                <!-- <BoxView bind:Index ={View.Index} on:spliteClick on:removeClick></BoxView>  -->
+            
             {/if}
-        </div> 
-    {/if}
+        </div>  
+        {/if}
+
+
 <style>      
     .divCanvas{
         background-color: blue;   
