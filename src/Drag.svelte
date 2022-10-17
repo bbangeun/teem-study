@@ -29,7 +29,9 @@
         console.log('----------------------------------------------');
         console.log('Drag Test Start ');
 
-        const item = document.querySelector(".divResize");
+        //const item = document.querySelector(".divResize");
+        const item =document.getElementById('R');
+        
         item.addEventListener("dragstart", (e) => {
             console.log(e);
             console.log("dragstart");
@@ -52,10 +54,6 @@
 
             //DragProcess(e);
         });
-
-        
-
-
         console.log('----------------------------------------------');
     })
 
@@ -64,53 +62,21 @@
         let ParentElement;
         let Element;
 
-        let V1E;
-        let V2E;
+        let V1E, V2E;
 
-        let V1HRatio;
-        let V2HRatio;
+        let V1VRatio, V2VRatio;        
 
-        let V1_Width;
-        let V2_Width;
-
-        let V1VRatio;
-        let V2VRatio;
-
-        let V1_Height;
-        let V2_Height;
-
+        let V1_Height, V2_Height;        
 
         ParentElement = document.getElementById('W');              
         
-        Element = document.getElementById('R');
-        /*
-        console.log(ParentElement.clientWidth);  
-        console.log(e.clientX);
-        */
+        Element = document.getElementById('R');        
   
         console.log(ParentElement.clientHeight);  
-        console.log(e.clientY);
-        
+        console.log(e.clientY);        
 
         V1E = document.getElementById(V1.Index);
-        V2E = document.getElementById(V2.Index);
-        
-        /*
-        V1_Width = e.clientX;
-        V2_Width = ParentElement.clientWidth - e.clientX - 6;
-       
-
-        V1E.style.setProperty('width', V1_Width + 'px');
-        V2E.style.setProperty('width', V2_Width + 'px');
-
-        //V1HRatio = Math.floor(((e.clientX + 3) / (ParentElement.clientWidth)) * 100);
-        V1HRatio = (((e.clientX + 3) / (ParentElement.clientWidth)) * 100).toFixed(2);
-
-        V2HRatio = 100 - V1HRatio;  
-        console.log(V1_Width, V2_Width);
-        console.log(V1HRatio, V2HRatio);
-        */
-     
+        V2E = document.getElementById(V2.Index);     
       
         V1_Height = e.clientY - ParentElement.getBoundingClientRect().top;        
         V2_Height = ParentElement.clientHeight  - V1_Height - 6;
@@ -125,8 +91,7 @@
         V2VRatio = 100 - V1VRatio;
 
         console.log(V1_Height,  V2_Height);
-        console.log(V1VRatio,   V2VRatio);
-      
+        console.log(V1VRatio,   V2VRatio);      
 
         console.log('DragProcess(e)');
     }

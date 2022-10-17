@@ -103,7 +103,7 @@
     {
         let ParentElement;
         let Element;
-
+        
         let V1V, V2V;  
 
         let V1E, V2E;       
@@ -112,9 +112,7 @@
 
         let V1_Width, V2_Width;
 
-
-        let V1VRatio, V2VRatio;
-        
+        let V1VRatio, V2VRatio;        
 
         let V1_Height, V2_Height;     
 
@@ -179,12 +177,6 @@
                 Child_V1.VRatio = V1VRatio +'%'; 
                 Child_V2.VRatio = V2VRatio +'%';
             }
-            
-            /*
-            Child_V1.VRatio = V1VRatio +'%'; 
-            Child_V2.VRatio = V2VRatio +'%';
-            */
-
             console.log(V1_Height,  V2_Height);
             console.log(V1VRatio+'%', V2VRatio+'%');
         }
