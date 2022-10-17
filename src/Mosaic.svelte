@@ -10,8 +10,8 @@
 
     import { apiData, drinkNames } from './stores.js';
 
-    const API_LOAD_URL = "http://127.0.0.1:8887/pane/" //"http://127.0.0.1:8887/pane/1"
-    const API_SAVE_URL = "http://127.0.0.1:8887/pane/" //"http://127.0.0.1:8887/pane/1"
+    const API_LOAD_URL = "http://127.0.0.1:8887/pane/"      //"http://127.0.0.1:8887/pane/1"
+    const API_SAVE_URL = "http://127.0.0.1:8887/pane"      //"http://127.0.0.1:8887/pane/1"
 
     let NewViewBox;    
 
@@ -33,8 +33,8 @@
       console.log('----------------------------------------------');
       const res = await fetch(API_LOAD_URL + Page)
           .then(response => response.json())
-          .then(data => {          
-          
+          .then(data => {  
+
           console.log("Page : "+ data.page_id);
           console.log(data.structure);
 
@@ -88,7 +88,8 @@
 
       $ViewList.sort( function compare(a, b) { return a.Index - b.Index; });
 
-      CurrentPage = 0;
+      SetDefaultButtonColor(true);
+      //CurrentPage = 0;
     }
     async function LoadPage(Page){
 
@@ -97,30 +98,33 @@
       if(Page > 0 )
       {
         let Result = await GetPageInfo(Page);
-
+     
         if(Result === true){
           console.log('LoadPage Sucessed[' + Page + ']');
-        }else{
+          SetDefaultButtonColor(false);    
+        }else
+        {
           console.log('LoadPage Faield[' + Page + ']' + 'So Default Set');
           SetDefaultPage();
         }
+
+        CurrentPage = Page;
+        SetButtonColor(CurrentPage);
       }
       else
       {
         SetDefaultPage();
       }
 
-      TopParentView = $ViewList[0];
-
-      SetButtonColor(CurrentPage);
-    }
+      TopParentView = $ViewList[0];      
+    }    
     onMount(async ()=>{
 
         console.log('----------------------------------------------');
         console.log('Mosaic onMount Start');
         console.log('----------------------------------------------');
       
-        LoadPage("0");
+        LoadPage("1");
 
         console.log('----------------------------------------------');
         console.log('Mosaic onMount End');
@@ -494,9 +498,9 @@
       let SeletedButtonID;
       let LoopButtonID;
 
-      SeletedButtonID   = 'b'+ Page;
+      SeletedButtonID   = 'b'+ Page.toString();
 
-      for(let i = 0; i < 6; i++)
+      for(let i = 1; i < 6; i++)
       {
         LoopButtonID   = 'b'+i.toString();
         PageButton = document.getElementById(LoopButtonID);
@@ -510,19 +514,36 @@
           PageButton.style.background = "green";
         }
       }
-    }      
-    function onClickedDefault(){ LoadPage("0"); } 
-    function onClickedLoad1(){ LoadPage("1"); }
-    function onClickedLoad2(){ LoadPage("2"); }    
-    function onClickedLoad3(){ LoadPage("3"); }
-    function onClickedLoad4(){ LoadPage("4"); }
-    function onClickedLoad5(){ LoadPage("5"); }
+    }   
+    function SetDefaultButtonColor(flag){
+
+      let DefaultButton;
+
+      DefaultButton = document.getElementById('b0');
+
+      if(flag){
+        DefaultButton.style.background = "red";
+      }
+      else{
+        DefaultButton.style.background = "green";
+      }
+
+    }   
+    function onClickedDefault(){ LoadPage(0); } 
+    function onClickedLoad1(){ LoadPage(1); }
+    function onClickedLoad2(){ LoadPage(2); }    
+    function onClickedLoad3(){ LoadPage(3); }
+    function onClickedLoad4(){ LoadPage(4); }
+    function onClickedLoad5(){ LoadPage(5); }
     async function onClickedSave() 
     {
       let Value = '';
       let View;
       let Length = $ViewList.length; 
       let result = null;
+
+      let page_id = 0;
+      let structure = '';
 
       console.log('----------------------------------------------');
       console.log('Mosaic Save Start');
@@ -539,16 +560,39 @@
         } 
       }
 
+      page_id = CurrentPage;
+      structure = Value;
+
       console.log('[' + CurrentPage + ']:['+ Value +']');
+      
+      const res = await fetch(API_SAVE_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          page_id,
+          structure
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).catch(error => {        
+          console.log(error);
+      });
+      console.log(res);
 
-      const res = await fetch('https://httpbin.org/post', {
-      method: 'POST',
-      body: JSON.stringify({
-        CurrentPage,
-        Value
-      })
-      })
+      if( (res.status === 200) && (res.statusText === "OK") )
+      { 
+        alert(`Mosaic save successed. Page : ${CurrentPage}`)
+      }
+      else
+      {        
+        alert(`Mosaic save failed. Page : ${CurrentPage}`)
 
+        console.log("**********************************************");
+        console.log(`Mosaic Save Failed`);
+        console.log(`Mosaic Save Failed Page:${CurrentPage}`);
+        console.log(`Mosaic Save Failed Value${structure}`);    
+        console.log("**********************************************");    
+      } 
       const json = await res.json()
       result = JSON.stringify(json)
       console.log(result);
