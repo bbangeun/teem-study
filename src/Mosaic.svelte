@@ -574,7 +574,8 @@
         headers: {
           'Content-Type': 'application/json'
         }
-      }).catch(error => {        
+      }).catch(error => {  
+          console.log('Mosaic save failed(POST Error). Page : ${CurrentPage}`);      
           console.log(error);
           alert(`Mosaic save failed(POST Error). Page : ${CurrentPage}`)
       });
