@@ -577,7 +577,7 @@
       }).catch(error => {  
           console.log(`Mosaic save failed(POST Error). Page : ${CurrentPage}`);      
           console.log(error);
-          alert(`Mosaic save failed(POST Error). Page : ${CurrentPage}`)
+          alert(`Mosaic save failed(POST Error)pai. Page : ${CurrentPage}`)
       });
       console.log(res);
 
