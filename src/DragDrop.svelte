@@ -30,23 +30,27 @@
         Element_C5 = document.getElementById("C5"); 
         Element_C6 = document.getElementById("C6"); 
 
+        /*
+        document.addEventListener("dragstart", event => {
+            // 드래그한 요소에 대한 참조 저장
+            dragged = event.target;
+            // 반투명하게 만들기
+            event.target.classList.add("dragging");
+        });
+        */
         
-        
-        //Element_V1.addEventListener("dragstart",        eventDragDrop);
-        //Element_V1.addEventListener("dragend",          eventDragDrop);  
-
+   
         Element_V3.addEventListener("dragstart",        eventDragStart);
         //Element_V3.addEventListener("dragover",         eventDragOver);
+        //Element_V3.addEventListener("drag",             eventDrag);
         Element_V3.addEventListener("drop",             eventDrop);
         Element_V3.addEventListener("dragend",          eventDragEnd);  
 
         Element_V4.addEventListener("dragstart",        eventDragStart);
-        //Element_V4.addEventListener("dragover",         eventDragOver);
+        //Element_V4.addEventListener("dragover",       eventDragOver);   
         Element_V4.addEventListener("drop",             eventDrop);
         Element_V4.addEventListener("dragend",          eventDragEnd);  
-
-        //Element_V2.addEventListener("dragstart",      eventDragDrop);
-        //Element_V2.addEventListener("dragend",        eventDragDrop);  
+  
 
         Element_V5.addEventListener("dragstart",        eventDragStart);
         //Element_V5.addEventListener("dragover",         eventDragOver);
@@ -63,6 +67,11 @@
         Element_C5.addEventListener("dragover",         eventDragOver);
         Element_C6.addEventListener("dragover",         eventDragOver);
 
+        //Element_C3.addEventListener("dragleave",         eventDragLeave);
+        //Element_C4.addEventListener("dragleave",         eventDragLeave);
+        //Element_C5.addEventListener("dragleave",         eventDragLeave);
+        //Element_C6.addEventListener("dragleave",         eventDragLeave);
+
         console.log('----------------------------------------------');
         console.log('onMount End ');
         console.log('----------------------------------------------');     
@@ -76,6 +85,7 @@
         event.dataTransfer.setData("text/plain", event.path[0].id);
 
     }
+
     function eventDrop(event)
     {   
         event.preventDefault();
@@ -89,23 +99,32 @@
     function eventDragOver(event)
     {
         event.preventDefault();
-        
-        let targetID = event.path[0].id;
-
-        //visibleTopPreview = false;
-        //visibleLeftPreview = false;
+        let targetID = this.id;
+           
         
         if(targetID)
         {
-            GetPreViewPosition(targetID, event.offsetX, event.offsetY );
+            previewType = GetPreViewPosition(targetID, event.offsetX, event.offsetY );
+            previewType = previewType;
+            console.log(targetID); 
+            
         }
         else
-        {            
-            //console.log(event); 
-            //console.log(`Not exist target[${TargetID}]`); 
+        {
             console.log(`Not exist target`); 
+        }  
+        console.log(targetID, previewType);
+        
+    }
+    function eventDragLeave(event)
+    {
+        event.preventDefault();
+        console.log(`eventDragLeave${this.id}`); 
+        if(this.id === 'C4')
+        {
+            //previewType = '';
         }
-     
+        
     }
     function eventDragEnd(event)
     {   
@@ -129,6 +148,8 @@
         let rangeRight = 0;
         let bottomHeigtStart = 0; 
 
+        let result = '';
+
 
         let targetElement = document.getElementById(eleID);    
 
@@ -137,6 +158,8 @@
             let viewRect = targetElement.getBoundingClientRect();
             targetWidth  = targetElement.getBoundingClientRect().right  - targetElement.getBoundingClientRect().left;
             targetHeight = targetElement.getBoundingClientRect().bottom - targetElement.getBoundingClientRect().top;   
+
+            //console.log(targetWidth,  targetHeight);
             
             if( (targetWidth > 0) && (targetHeight > 0) )
             {
@@ -157,31 +180,36 @@
                 
                 bottomHeigtStart = targetHeight - topHeightRange;
 
+              
                 //visibleTopPreview = false;
 
                 if( ((posX > 0) && (posX < leftEnd)) && (( posY > 0) &&  (posY < targetHeight)) ) //left
                 {   
                     console.log('Position:left');
-                    //previewType = 'left';
+                    result = 'left';
                 }               
                 else if( ((posX > rightStart) && (posX < targetWidth)) && ( (posY > 0) && (posY < targetHeight)) ) //right
                 {   
                     console.log('Position:right');
-                    //previewType = 'right';
+                    result = 'right';
                 }               
                 else if( ((posX > leftEnd) && (posX < rightStart)) && ( (posY > 0) && (posY < topHeightEnd)) ) //top
                 {
                     console.log('Position:top');
-                    //previewType = 'top';                    
+                    result = 'top';                    
                 }
                 else if( ((posX > leftEnd) && (posX < rightStart)) && ( (posY > bottomHeigtStart) && (posY < targetHeight)) ) //bottom
                 {             
                     console.log('Position:bottom');      
-                    //previewType = 'bottom';
+                    result = 'bottom';
                 }           
                 else
                 {                    
                     //console.log('Position:abnormal position');
+                    //console.log(`Size: ${targetWidth} ${targetHeight}`);
+                    console.log('Position:none');
+                    result = ''; 
+                    //result = ''; 
                   
                 }              
             }
@@ -194,6 +222,8 @@
         {           
             console.log(`Not exist element[${eleID}]`); 
         }
+
+        return result;
     }
 </script>
 
@@ -206,8 +236,8 @@
         </div>
         <div id = "R1" class = "divResize"  style= "width: 6px; min-width:  6px; height:100%;" ></div>
         <div id = "V4" style= "background-color:gray;  width:calc(25% - 3px);  height:70%; " draggable="true"  display=block;>
-            <div style= "background-color:beige; height:20px;">V4</div>    
-            <div id = "C4" style= "background-color:brown; height:calc(100% - 20px); z-index=1" draggable="true" >
+            <div style= "background-color:beige; width=100%; height:20px;">V4</div>    
+            <div id = "C4" style= "background-color:brown; width=100%; height:calc(100% - 20px); z-index=1 " draggable="true"  >
                 {#if previewType == 'top'}
                     <div class="topPreview"/>            
                 {:else if previewType == 'left'}                
@@ -216,8 +246,8 @@
                     <div class="rightPreview"/>
                 {:else if previewType == 'bottom'}                
                     <div class="bottomPreview"/>              
-                {/if}
-                    <div class="bottomPreview"/>
+                {/if}   
+                              
             </div>            
         </div> 
     </div>
@@ -274,6 +304,7 @@
     background-color: skyblue;
     opacity: 50%; 
     z-index: 0;
+   
 }
 .bottomPreview{
     position: relative;
@@ -284,6 +315,7 @@
     background-color: skyblue;
     opacity: 50%; 
     z-index: 0;
+   
 }
 .leftPreview{
     position: relative;
@@ -294,6 +326,7 @@
     background-color: skyblue;
     opacity: 50%; 
     z-index: 0;
+   
 }
 .rightPreview{
     position: relative;
@@ -304,6 +337,7 @@
     background-color: skyblue;
     opacity: 50%; 
     z-index: 0;
+    
 }
 
 </style>
