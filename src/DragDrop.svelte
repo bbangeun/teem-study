@@ -3,7 +3,8 @@
     import {onMount, beforeUpdate, afterUpdate, onDestroy} from 'svelte'
     import { fix_and_destroy_block } from 'svelte/internal'
 
-    let previewType = '';
+    let previewType3 = '';
+    let previewType4 = '';
 
     onMount(async() => {
 
@@ -41,31 +42,26 @@
         
    
         Element_V3.addEventListener("dragstart",        eventDragStart);
-        //Element_V3.addEventListener("dragover",         eventDragOver);
-        //Element_V3.addEventListener("drag",             eventDrag);
+        Element_V3.addEventListener("dragleave",        eventDragLeave);
+        Element_V3.addEventListener("dragover",         eventDragOver);
         Element_V3.addEventListener("drop",             eventDrop);
         Element_V3.addEventListener("dragend",          eventDragEnd);  
 
         Element_V4.addEventListener("dragstart",        eventDragStart);
-        //Element_V4.addEventListener("dragover",       eventDragOver);   
+        Element_V4.addEventListener("dragleave",        eventDragLeave);
+        Element_V4.addEventListener("dragover",         eventDragOver);   
         Element_V4.addEventListener("drop",             eventDrop);
         Element_V4.addEventListener("dragend",          eventDragEnd);  
+        //Element_V4.addEventListener("mousemove",        eventMouseOn);
   
 
-        Element_V5.addEventListener("dragstart",        eventDragStart);
-        //Element_V5.addEventListener("dragover",         eventDragOver);
-        Element_V5.addEventListener("drop",             eventDrop);
-        Element_V5.addEventListener("dragend",          eventDragEnd);  
 
-        Element_V6.addEventListener("dragstart",        eventDragStart);
-        //Element_V6.addEventListener("dragover",         eventDragOver);
-        Element_V6.addEventListener("drop",             eventDrop);
-        Element_V6.addEventListener("dragend",          eventDragEnd);
-
+        /*
         Element_C3.addEventListener("dragover",         eventDragOver);
         Element_C4.addEventListener("dragover",         eventDragOver);
         Element_C5.addEventListener("dragover",         eventDragOver);
         Element_C6.addEventListener("dragover",         eventDragOver);
+        */
 
         //Element_C3.addEventListener("dragleave",         eventDragLeave);
         //Element_C4.addEventListener("dragleave",         eventDragLeave);
@@ -76,6 +72,8 @@
         console.log('onMount End ');
         console.log('----------------------------------------------');     
     })
+
+
 
     function eventDragStart(event)
     { 
@@ -96,34 +94,56 @@
         console.log(event);
         console.log(`${data} -> ${event.path[0].id} X:${event.offsetX} Y:${event.offsetY}`);
     }
-    function eventDragOver(event)
+    function eventDragEnter(event)
     {
         event.preventDefault();
+        console.log(`type:${event.type}`);
+
+    }
+    function eventDragOver(event)
+    {
+        event.preventDefault();      
+       
         let targetID = this.id;
-           
+        let type = '';    
+       
+        
+        //console.log(event); 
+        //console.log(targetID, event.offsetX, event.offsetY, event.layerX, event.layerY ); 
+        
+       
         
         if(targetID)
         {
-            previewType = GetPreViewPosition(targetID, event.offsetX, event.offsetY );
-            previewType = previewType;
             console.log(targetID); 
-            
+          
+            type = GetPreViewPosition(targetID, event.offsetX, event.offsetY );
+
+            if(targetID === 'V3')
+            {
+                previewType3 = type;
+            }
+            else
+            {
+                previewType4 = type;
+            }
+            //previewType = previewType;
+        
+                    
         }
         else
         {
             console.log(`Not exist target`); 
         }  
-        console.log(targetID, previewType);
-        
+ 
+    
+       // console.log(targetID, previewType);        
     }
     function eventDragLeave(event)
     {
         event.preventDefault();
+        //previewType = '';
         console.log(`eventDragLeave${this.id}`); 
-        if(this.id === 'C4')
-        {
-            //previewType = '';
-        }
         
     }
     function eventDragEnd(event)
@@ -150,8 +170,9 @@
 
         let result = '';
 
-
         let targetElement = document.getElementById(eleID);    
+
+        console.log(posX, posY);
 
         if(targetElement)
         { 
@@ -207,10 +228,8 @@
                 {                    
                     //console.log('Position:abnormal position');
                     //console.log(`Size: ${targetWidth} ${targetHeight}`);
-                    console.log('Position:none');
-                    result = ''; 
-                    //result = ''; 
-                  
+                    console.log('Position:none');                    
+                    result = '';                   
                 }              
             }
             else
@@ -229,30 +248,43 @@
 
 <div id = "P0"
      class="divCanvas"> 
-    <div id = "V1"     class="stViewBox"  >
-        <div id = "V3" style= "background-color:aqua;  width:calc(25% - 3px); height:70%; display=block;" draggable="true" display=block;  >
-            <div style= "background-color:beige; height:20px;">V3</div>
-            <div id = "C3" style= "background-color:brown; height:calc(100% - 20px);" draggable="true">V3</div>       
+    <div id = "V1"  class="stViewBox"  >
+        
+        <div id = "V3" class = "stView"     draggable="true"   >
+            <div class ="stHeader">Header:V3</div>    
+            <div class ="stContent">Content:V3</div>    
+            {#if previewType3 == 'top'}
+                <div class="topPreview"/>            
+            {:else if previewType3 == 'left'}                
+                <div class="leftPreview"/>   
+            {:else if previewType3 == 'right'}                
+                <div class="rightPreview"/>
+            {:else if previewType3 == 'bottom'}                
+                <div class="bottomPreview"/>              
+            {/if} 
         </div>
-        <div id = "R1" class = "divResize"  style= "width: 6px; min-width:  6px; height:100%;" ></div>
-        <div id = "V4" style= "background-color:gray;  width:calc(25% - 3px);  height:70%; " draggable="true"  display=block;>
-            <div style= "background-color:beige; width=100%; height:20px;">V4</div>    
-            <div id = "C4" style= "background-color:brown; width=100%; height:calc(100% - 20px); z-index=1 " draggable="true"  >
-                {#if previewType == 'top'}
-                    <div class="topPreview"/>            
-                {:else if previewType == 'left'}                
-                    <div class="leftPreview"/>   
-                {:else if previewType == 'right'}                
-                    <div class="rightPreview"/>
-                {:else if previewType == 'bottom'}                
-                    <div class="bottomPreview"/>              
-                {/if}   
-                              
-            </div>            
+        
+        <div id = "R1" class = "divResize"  style= "width: 6px; min-width:6px; height:100%;" ></div>
+
+        <div id = "V4" class = "stView"     draggable="true" > 
+
+            <div class ="stHeader">Header:V4</div>    
+            <div class ="stContent">Content:V4  </div>               
+           
+            {#if previewType4 == 'top'}
+                <div class="topPreview"/>            
+            {:else if previewType4 == 'left'}                
+                <div class="leftPreview"/>   
+            {:else if previewType4 == 'right'}                
+                <div class="rightPreview"/>
+            {:else if previewType4 == 'bottom'}                
+                <div class="bottomPreview"/>              
+            {/if}
+           
         </div> 
     </div>
     <div id = "R0"     class = "divResize"  style= "width:100%; height: 6px; min-height: 6px; "></div>
-    <div id = "V2"     class="stViewBox"  >
+    <div id = "V2"     class="stViewBox">
         <div id = "V5" style= "background-color:aqua;  width:calc(25% - 3px); height:70%; " draggable="true" display=block; >
             <div style= "background-color:beige; height:20px;">V5</div>
             <div id = "C5" style= "background-color:brown; height:calc(100% - 20px);" draggable="true">V5</div>
@@ -261,8 +293,6 @@
         <div id = "V6" style= "background-color:gray;  width:calc(25% - 3px);  height:70%; " draggable="true" display=block;>
             <div style= "background-color:beige; height:20px;" >V6</div>
             <div id = "C6" style= "background-color:brown; height:calc(100% - 20px);" draggable="true" >V6</div>
-          
-            
         </div> 
     </div>
 </div>
@@ -296,48 +326,73 @@
    background-color: skyblue;
 }  
 .topPreview{
-    position: relative;
+    position: absolute;
     left:0px;
     top:0px;
     width: 100%;
     height: 50%;
     background-color: skyblue;
     opacity: 50%; 
-    z-index: 0;
+    z-index: 100;
+    pointer-events: none; 
    
 }
 .bottomPreview{
-    position: relative;
+    position: absolute;
     left:0px;
     top:50%;
     width: 100%;
     height: 50%;
     background-color: skyblue;
     opacity: 50%; 
-    z-index: 0;
+    z-index: 100;
+    pointer-events: none; 
    
 }
 .leftPreview{
-    position: relative;
+    position: absolute;
     left:  0px;    
     top:   0px;
     width: 50%;
     height: 100%;
     background-color: skyblue;
     opacity: 50%; 
-    z-index: 0;
+    z-index: 100;
+    pointer-events: none; 
    
 }
 .rightPreview{
-    position: relative;
-    left:  50%;    
+    position: absolute;
     top:   0px;
+    left:  50%;
     width: 50%;
     height: 100%;
     background-color: skyblue;
     opacity: 50%; 
-    z-index: 0;
-    
+    z-index: 100;
+    pointer-events: none; 
+}
+.stView{    
+    position: relative; 
+    background-color:gray;
+    width:calc(25% - 3px);
+    height:70%;  
+}
+.stHeader{
+    background-color:beige; 
+    position:relative;
+    left:0px;
+    top:0px;
+    width:100%; 
+    height:20px;
+}
+.stContent{
+    background-color:brown;
+    position:relative; 
+    left:0px; 
+    top:0px;
+    width:100%; 
+    height:calc(100% - 20px);    
 }
 
 </style>
