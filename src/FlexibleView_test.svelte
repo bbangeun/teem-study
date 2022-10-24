@@ -587,7 +587,11 @@
         
         dispatchSpliteChild('SpliteChild', event.detail);
     } 
-
+    
+    const EventDialogDragStart = event =>{
+        console.log(`EventDialogDragStart`);
+        console.log(`EventDialogDragStart ${event.detail}`);
+    }
     console.log('----------------------------------------------');
     console.log('View Init End');
     console.log('----------------------------------------------');    
@@ -609,7 +613,7 @@
                 <div id = "R{View.Index}" class = "divResize" style= "width:{Child_V1.HRatio}  height:6px; min-height: 6px;" draggable="true" ></div>
                 <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent}></svelte:self>     
             {:else}
-                <BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick} ></BoxView> 
+                <BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick} on:DialogDragStart={EventDialogDragStart} ></BoxView> 
                 <!-- <BoxView bind:Index ={View.Index} on:spliteClick on:removeClick></BoxView>  -->
             
             {/if}

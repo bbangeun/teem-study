@@ -20,6 +20,9 @@ export const drinkNames = derived(apiData, ($apiData) => {
   return [];
 });
 
+export let g_DragSourceElement = writable(null);
+export let g_IsDropSafeZone    = writable(false);
+
 export  class  ViewBox{
     constructor(Index, PID, Type, HRatio, VRatio, V1, V2, Title, Display){
      this.Index = Index,
@@ -40,5 +43,12 @@ export  class  ViewBox{
    GetSaveParam(){
     return this.Index+','+this.PID+','+this.Type+','+this.HRatio+','+this.VRatio+','+this.V1+','+this.V2+','+this.Display;
    }
+ }
+
+ export class DragStartResult{
+  constructor(Index,Event){
+    this.Index   = Index,
+    this.Event   = Event   
+  }
  }
 

@@ -1,6 +1,6 @@
 <script>
     import { writable  } from 'svelte/store'
-    import { ViewList , ViewBox } from './stores.js'
+    import { ViewList , ViewBox, g_DragSourceElement } from './stores.js'
     import BoxView from './BoxView.svelte'
     import {onMount, beforeUpdate, afterUpdate, onDestroy} from 'svelte'
     import { createEventDispatcher } from "svelte";    
@@ -16,6 +16,8 @@
     export let Total_Width  = '0%';
     export let Total_Height = '0%';
 
+    let g_PreviewType = 'none'
+
     let TempView = {};
     let IsDragStart = false;
 
@@ -29,6 +31,8 @@
     const dispatchDragEnd      = createEventDispatcher();
 
     const dispatchDrop          = createEventDispatcher();
+
+    const dispatchChildDragStart = createEventDispatcher();
 
 
     
@@ -604,6 +608,153 @@
         }
         */
    
+    }        
+    const EventChildDragStart = event =>{
+        let targetID = '';
+        let dragStartEvent;
+
+        console.log(event.detail.detail.Index);  
+        console.log(event.detail.detail.Event);  
+           
+        targetID = event.detail.detail.Index;
+        dragStartEvent = event.detail.detail.Event;
+        console.log(`EventChildDragStart ID:${targetID}`);
+         
+        HideDragView(targetID, dragStartEvent);
+    }
+
+    const EventDialogDragStart = event  =>{
+        dispatchChildDragStart('EventChildDragStart', event);
+    }
+    function GetDragImageElement(sourceElement){
+        
+        let cloneElement = null;
+
+        cloneElement = sourceElement.cloneNode(true);
+
+        cloneElement.id    = 'c'+sourceElement.id;
+        cloneElement.style.width  = sourceElement.style.width;
+        cloneElement.style.height = sourceElement.style.height;
+        //cloneElement.style.opacity = '100%';
+        cloneElement.style.zIndex = 0;
+
+        return cloneElement;
+    }
+
+    function HideDragView(dragIndex, event)
+    {
+        let cloneElement = null;
+        let srcElement = null; 
+        let parentElement = null;
+        let pairElement = null;
+        let resizeElement = null;   
+
+        let srcBoxElement  = null;
+        let pairBoxElement = null;
+
+        console.log('==============================================');
+        console.log('HideDragView Start  ');
+        console.log('==============================================');
+      
+        parentElement = document.getElementById(View.Index);
+        srcElement    = document.getElementById(dragIndex);
+        cloneElement  = GetDragImageElement(srcElement);
+        resizeElement = document.getElementById('R'+View.Index.toString());
+
+        parentElement.style.position = "relative"; 
+        //parentElement.style.display = "";      
+        //parentElement.style.zIndex = 90;
+       
+        //parentElement.style.display = 'flex';
+
+        parentElement.appendChild(cloneElement);
+        
+        srcBoxElement = document.getElementById("D"+dragIndex.toString());
+
+       
+        if(dragIndex === View.V1)
+        {
+            pairElement = document.getElementById(View.V2);   
+            pairBoxElement = document.getElementById("D"+View.V2.toString());          
+        }
+        else{
+            pairElement = document.getElementById(View.V1); 
+            pairBoxElement = document.getElementById("D"+View.V1.toString());           
+        }
+
+        srcBoxElement = document.getElementById("D"+dragIndex.toString());
+
+  
+  
+     
+
+           
+        pairElement.style.position = 'absolute'; 
+        //pairBoxElement.style.display = ''; //      
+        pairElement.style.left  = '0px';
+        pairElement.style.top   = '0px';
+        pairElement.style.zIndex   = 100;     
+        /*
+        if(View.Type === 'H')
+        {
+            pairElement.style.width  = '100%';
+        }else
+        {
+            pairElement.style.height = '100%';
+        }
+        */
+
+        pairElement.style.width  = '100%';
+        pairElement.style.height = '100%';
+       
+        /*
+        pairBoxElement.style.position = 'absolute'; 
+        //pairBoxElement.style.display = ''; //      
+        pairBoxElement.style.left  = '0px';
+        pairBoxElement.style.top   = '0px';
+        pairBoxElement.style.zIndex   = 90;     
+        if(View.Type === 'H')
+        {
+            pairBoxElement.style.width  = '100%';
+        }else
+        {
+            pairBoxElement.style.height = '100%';
+        }
+        */
+        
+        resizeElement.style.display = 'none';
+
+    
+        srcElement.style.position = 'absolute';
+        //srcElement.style.display = ''; //
+   
+        srcElement.style.left     = '0px';
+        srcElement.style.top      = '0px';
+        srcElement.style.width    = '100%';
+        srcElement.style.height    = '100%';        
+        srcElement.style.opacity  = '0%';
+        srcElement.style.zIndex   = 101; 
+      
+
+        $g_DragSourceElement = srcElement;
+
+
+        
+        //pairBoxElement.style.zIndex = 100;        
+        //srcBoxElement.style.zIndex   = 90; 
+
+        
+        event.dataTransfer.dropEffect = 'move';
+        event.dataTransfer.setDragImage(cloneElement, 0, 0);
+
+        console.log(parentElement.style);
+        console.log(srcElement.style);
+        console.log(pairElement.style);
+    
+
+        console.log('==============================================');
+        console.log('HideDragView End  ');
+        console.log('==============================================');
     }
     
     /*=======================================================================*/
@@ -615,24 +766,34 @@
             class="divCanvas" 
             style= "width: {Total_Width}; height:{Total_Height}; display:{View.Display}">              
             {#if      View.Type === 'H'}
-                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} > </svelte:self> 
+                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart} > </svelte:self> 
                 <div id = "R{View.Index}"  class = "divResize" style= "width: 6px; min-width: 6px; height:{Child_V1.VRatio}" draggable="true"  ></div>
-                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} ></svelte:self>    
+                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart}></svelte:self>    
             {:else if View.Type === 'V'}
-                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} ></svelte:self> 
+                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart}></svelte:self> 
                 <div id = "R{View.Index}" class = "divResize" style= "width:{Child_V1.HRatio}  height:6px; min-height: 6px;" draggable="true" ></div>
-                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} ></svelte:self>     
+                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart}></svelte:self>     
             {:else}
-                <BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick} on:EventDialogDrag={EventDialogDrag}></BoxView>
+                <!--<BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick} on:EventDialogDrag={EventDialogDrag} on:DialogDragStart={EventDialogDragStart}></BoxView> -->
+                <BoxView    bind:Index ={View.Index} 
+                            on:spliteClick = {spliteButtonClick} 
+                            on:removeClick = {removeButtonClick} 
+                            on:DialogDragStart = {EventDialogDragStart}>
+                </BoxView>
+
+ 
             {/if}
         </div> 
     {/if}
 <style>      
     .divCanvas{
-        background-color: blue;   
+       
+        background-color: blue;
+        position: relative;  
         /* display: inline-flex;              */
         /*width:      100%;*/
         /* height: calc(100% - 10px);         */
+        z-index: 90;
     }     
     .divResize{        
         background-color: black;

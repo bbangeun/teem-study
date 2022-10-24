@@ -625,7 +625,8 @@
       </div>
     </div>
 
-    <style>            
+    <style> 
+            
       .divCanvas{
         background-color: white;
         display: flex;
@@ -633,8 +634,12 @@
         widows:  100%;
         height:  100%;
         padding: 0px;
-        margin:  0px;
+        margin:  0px;        
       }
+  
+                    
+  
+    
       .hdTop{
         background-color: blueviolet;
         display: flex; 			
@@ -643,9 +648,10 @@
         height:  50px;
         margin:  0px;
         padding: 0px;			
-      }      
-      .divContainer{                    
-        /*position: absolute;   */
+      }
+      
+      .divContainer{                   
+     
         position: absolute;   
         background-color: beige;     
 
@@ -655,12 +661,14 @@
         height:  calc(100% - 100px);
         margin:  0px;
         padding: 0px;
-
         
         display: flex;
         flex-direction: column;
+        z-index: 1;
 
       }
+   
+  
       .btnApply{            
         width:   80px;       
         height:  calc(100% -10px);       

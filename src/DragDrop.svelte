@@ -1,10 +1,14 @@
-<script>
+<script> 
+
 
     import {onMount, beforeUpdate, afterUpdate, onDestroy} from 'svelte'
     import { fix_and_destroy_block } from 'svelte/internal'
 
     let previewType3 = '';
     let previewType4 = '';
+
+    let g_TargetElement;
+    let g_IsDropZone = false;
 
     onMount(async() => {
 
@@ -73,15 +77,71 @@
         console.log('----------------------------------------------');     
     })
 
+    function GetDragImageElement(sourceElement){
+        
+        let cloneElement = null;
+
+        cloneElement = sourceElement.cloneNode(true);
+
+        cloneElement.id    = 'c'+sourceElement.id;
+        cloneElement.style.width  = sourceElement.style.width;
+        cloneElement.style.height = sourceElement.style.height;
+        cloneElement.style.zIndex = 0;
+
+        return cloneElement;
+    }
+
 
 
     function eventDragStart(event)
-    { 
+    {
+        let cloneElement = null;
+
         //event.preventDefault();
         console.log(`type:${event.type} ${event}`);     
-        console.log(event.path[0].id);      
+        console.log(event.path[0].id);
+        console.log(this.id);      
         event.dataTransfer.setData("text/plain", event.path[0].id);
+    
+        g_TargetElement = document.getElementById(event.path[0].id);
+        cloneElement  = GetDragImageElement(g_TargetElement);
+        
+        let V1View  = document.getElementById('V1'); 
+        V1View.appendChild(cloneElement);
+        
+        
+        V1View.style.position = "relative";
+        //V1View.style.display = "flex";
 
+        V1View.style.zIndex = 300;
+        
+
+        let PairView = document.getElementById('V3');
+        PairView.style.position = 'absolute';       
+        PairView.style.left  = '0px';
+        PairView.style.top   = '0px';
+        PairView.style.width = '50%';
+        PairView.style.zIndex = 600;                       
+       
+
+        let R1View = document.getElementById('R1');
+        R1View.style.display = 'none';
+     
+        g_TargetElement.style.position = 'absolute';
+        g_TargetElement.style.left     = '0%';
+        g_TargetElement.style.top      = '0px';
+        g_TargetElement.style.width    = '50%';
+        g_TargetElement.style.zIndex   = 600;
+        g_TargetElement.style.opacity  = '0%';
+
+        console.log(V1View.style);
+        console.log(g_TargetElement.style);
+        console.log(PairView.style);
+
+        g_IsDropZone = false;
+
+        event.dataTransfer.dropEffect = 'move';
+        event.dataTransfer.setDragImage(cloneElement, 0, 0);
     }
 
     function eventDrop(event)
@@ -90,9 +150,19 @@
         console.log(`type:${event.type}`);
 
         const data = event.dataTransfer.getData("text/plain");
+
+        if(this.id == 'V3')
+        {
+            previewType3 = '';
+        }else
+        {
+            previewType4 = '';
+        }
+
+        g_IsDropZone = true;
         
-        console.log(event);
-        console.log(`${data} -> ${event.path[0].id} X:${event.offsetX} Y:${event.offsetY}`);
+        //console.log(event);
+        console.log(`${data} -> ${this.id} X:${event.offsetX} Y:${event.offsetY}`);
     }
     function eventDragEnter(event)
     {
@@ -102,20 +172,24 @@
     }
     function eventDragOver(event)
     {
-        event.preventDefault();      
+        event.preventDefault();   
+        
+        if(g_TargetElement && (g_TargetElement.style.zIndex !== 0) )
+        {
+            g_TargetElement.style.zIndex = 0;
+        }
        
         let targetID = this.id;
         let type = '';    
        
         
         //console.log(event); 
-        //console.log(targetID, event.offsetX, event.offsetY, event.layerX, event.layerY ); 
-        
+        //console.log(targetID, event.offsetX, event.offsetY, event.layerX, event.layerY );         
        
         
         if(targetID)
         {
-            console.log(targetID); 
+            //console.log(targetID); 
           
             type = GetPreViewPosition(targetID, event.offsetX, event.offsetY );
 
@@ -142,15 +216,23 @@
     function eventDragLeave(event)
     {
         event.preventDefault();
-        //previewType = '';
+        if(this.id == 'V3')
+        {
+            previewType3 = '';
+        }
+        else
+        {
+            previewType4 = '';
+        }
+        
         console.log(`eventDragLeave${this.id}`); 
         
     }
     function eventDragEnd(event)
     {   
-        //event.preventDefault();
-        console.log(`type:${event.type}`);
-        console.log(event.path[0].id);
+        event.preventDefault();
+        console.log(`type:${event.type} IsDropZone:${g_IsDropZone}`);
+        console.log(this.id);
     }
     function GetPreViewPosition(eleID, posX, posY)
     {    
@@ -172,7 +254,7 @@
 
         let targetElement = document.getElementById(eleID);    
 
-        console.log(posX, posY);
+        //console.log(posX, posY);
 
         if(targetElement)
         { 
@@ -206,22 +288,22 @@
 
                 if( ((posX > 0) && (posX < leftEnd)) && (( posY > 0) &&  (posY < targetHeight)) ) //left
                 {   
-                    console.log('Position:left');
+                    //console.log('Position:left');
                     result = 'left';
                 }               
                 else if( ((posX > rightStart) && (posX < targetWidth)) && ( (posY > 0) && (posY < targetHeight)) ) //right
                 {   
-                    console.log('Position:right');
+                    //console.log('Position:right');
                     result = 'right';
                 }               
                 else if( ((posX > leftEnd) && (posX < rightStart)) && ( (posY > 0) && (posY < topHeightEnd)) ) //top
                 {
-                    console.log('Position:top');
+                    //console.log('Position:top');
                     result = 'top';                    
                 }
                 else if( ((posX > leftEnd) && (posX < rightStart)) && ( (posY > bottomHeigtStart) && (posY < targetHeight)) ) //bottom
                 {             
-                    console.log('Position:bottom');      
+                    //console.log('Position:bottom');      
                     result = 'bottom';
                 }           
                 else
@@ -250,9 +332,13 @@
      class="divCanvas"> 
     <div id = "V1"  class="stViewBox"  >
         
+      
         <div id = "V3" class = "stView"     draggable="true"   >
+           
+         
             <div class ="stHeader">Header:V3</div>    
-            <div class ="stContent">Content:V3</div>    
+            <div class ="stContent">Content:V3</div>
+              
             {#if previewType3 == 'top'}
                 <div class="topPreview"/>            
             {:else if previewType3 == 'left'}                
@@ -261,16 +347,20 @@
                 <div class="rightPreview"/>
             {:else if previewType3 == 'bottom'}                
                 <div class="bottomPreview"/>              
-            {/if} 
-        </div>
+            {/if}
+        
+       
+        </div>    
         
         <div id = "R1" class = "divResize"  style= "width: 6px; min-width:6px; height:100%;" ></div>
 
         <div id = "V4" class = "stView"     draggable="true" > 
 
+          
             <div class ="stHeader">Header:V4</div>    
             <div class ="stContent">Content:V4  </div>               
            
+          
             {#if previewType4 == 'top'}
                 <div class="topPreview"/>            
             {:else if previewType4 == 'left'}                
@@ -280,6 +370,9 @@
             {:else if previewType4 == 'bottom'}                
                 <div class="bottomPreview"/>              
             {/if}
+       
+       
+
            
         </div> 
     </div>
@@ -298,26 +391,38 @@
 </div>
 
 <style>  
+.divCanvas{
+   background-color: blue;
+   position: relative;   
+   left:    0px;
+   /*top:     calc(50px);*/
+   top:     0px;			        			
+   width:   100%;
+   /*height:  calc(100% - 50px);*/
+   height:  100%;
+   margin:  0px;
+   padding: 0px; 
+   z-index: 0;   
+}    
 .stViewBox{
     background-color:green; 
     width: 100%; 
     height:calc(50% - 3px);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    z-index: 1;
   
-}    
-.divCanvas{
-   background-color: blue;
-   position: absolute;   
-   left:    0;
-   top:     calc(50px);			        			
-   width:   100%;
-   height:  calc(100% - 50px);
-   margin:  0px;
-   padding: 0px; 
-   
-}     
+}  
+.stView{    
+    position: relative; 
+    background-color:gray;
+    width:calc(25% - 3px);
+    height:70%;  
+    z-index: 50;
+}
+  
+ 
 .divResize{        
    background-color: red;                                              
 }   
@@ -372,12 +477,7 @@
     z-index: 100;
     pointer-events: none; 
 }
-.stView{    
-    position: relative; 
-    background-color:gray;
-    width:calc(25% - 3px);
-    height:70%;  
-}
+
 .stHeader{
     background-color:beige; 
     position:relative;
@@ -393,6 +493,7 @@
     top:0px;
     width:100%; 
     height:calc(100% - 20px);    
+    z-index: 60;
 }
 
 </style>
