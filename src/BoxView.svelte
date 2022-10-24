@@ -12,6 +12,7 @@
     const dispatchRemove          = createEventDispatcher(); 
     const dispatchDialogDrag      = createEventDispatcher(); 
     const dispatchDialogDragStart = createEventDispatcher(); 
+    const dispatchDialogRollack   = createEventDispatcher(); 
 
     console.log('******************************')
     console.log(`BoxView:${Index}`)
@@ -142,17 +143,12 @@
 
         let targetID = '';       
         
-        targetID = this.id;    
-        
-        console.log(`eventDragOver*******************************************`);
-       
+        targetID = this.id;
         
         if($g_DragSourceElement)
         {           
             $g_DragSourceElement.style.zIndex = 0;
         }
-       
-     
 
         if(targetID !== '')
         {
@@ -173,14 +169,19 @@
     {
         event.preventDefault();
         console.log(`eventDrop${this.id}`);
-        //$g_IsDropSafeZone = true;
+        g_PreviewType = 'none';
+        $g_IsDropSafeZone = true;
     }
     function eventDragEnd(event)
     {
         event.preventDefault();
         console.log(`eventDragEnd${this.id}`);
         g_PreviewType = 'none';
-        //$g_IsDropSafeZone = false;
+        if($g_IsDropSafeZone == false)
+        {
+            dispatchDialogRollack('DialogRollback', Index);
+        }
+        $g_IsDropSafeZone = false;
     }   
     function GetPreViewPosition(eleID, posX, posY)
     {    
@@ -255,9 +256,7 @@
                     result = 'bottom';
                 }           
                 else
-                {                    
-                    //console.log('Position:abnormal position');
-                    //console.log(`Size: ${targetWidth} ${targetHeight}`);
+                {
                     console.log('Position:none');                    
                     result = '';                   
                 }              
