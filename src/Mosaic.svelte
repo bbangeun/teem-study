@@ -6,7 +6,7 @@
     
     import FlexibleView from './FlexibleView.svelte'    
     
-    import { ViewList , ViewBox } from './stores.js'
+    import { ViewList , ViewBox, DropInfo } from './stores.js'
 
     import { apiData, drinkNames } from './stores.js';
 
@@ -151,8 +151,8 @@
         console.log('----------------------------------------------');
 
         TopParentIndex = GetTopParentIndex();
-        TopRightIndex = GetTopRightWindow(TopParentIndex);
-        TopRightView  = GetViewFromList(TopRightIndex);
+        TopRightIndex  = GetTopRightWindow(TopParentIndex);
+        TopRightView   = GetViewFromList(TopRightIndex);
 
         if(TopRightView.PID  >= 0){       
           ParentView    = GetViewFromList(TopRightView.PID);
@@ -243,7 +243,7 @@
         console.log($ViewList);
         console.log('----------------------------------------------');
 
-      }
+    }
 
 
     function onClickedRefresh () {
@@ -370,6 +370,141 @@
       console.log(" "); 
       */
  
+    }
+    const EventChildDrop = event => {
+
+      let TopRightIndex = 0;
+      let TopRightView  = {};
+      let ParentView    = {};
+      let V1            = {};
+      let V2            = {};
+      let LastIndex     = 0;   
+      let TopRightElement;
+      let NewViewHRatio = '';
+      let NewViewVRatio = '';
+      let TopParentIndex = 0;
+
+      let NewParentView = {};
+
+      let TargetIndex = 0;
+      let SourceIndex = 0;
+      let TargetView = {};
+      let TagetElement;
+      let Position = 'none';
+
+      console.log(`=======================================================`);
+      console.log(`EventChildDrop Start`);
+      console.log(`=======================================================`);
+      console.log(`Source:${$DropInfo.Source} Target:${$DropInfo.Target} Position:${$DropInfo.Position}`);
+    
+      console.log('----------------------------------------------');
+      console.log($ViewList);        
+      console.log('----------------------------------------------');
+      
+      TargetIndex   = $DropInfo.Target;
+      SourceIndex   = $DropInfo.Source;
+      Position      = $DropInfo.Position;
+      TargetView     = GetViewFromList(TopRightIndex);
+
+      if(TargetView.PID  >= 0){       
+        ParentView    = GetViewFromList(TargetView.PID);
+      }       
+
+      LastIndex = $ViewList[($ViewList.length-1)].Index;   
+
+      TagetElement = document.getElementById(TargetView.Index);
+
+      if(TargetView.PID  >= 0){      
+        NewParentView         =  new ViewBox(++LastIndex, TargetView.PID);
+      }
+      else{
+        NewParentView         =  new ViewBox(++LastIndex, -1);
+      }
+      NewParentView.HRatio  =  TargetView.HRatio;
+      NewParentView.VRatio  =  TargetView.VRatio;
+
+      V2 =  new ViewBox(SourceIndex, NewParentView.Index);
+
+      if(TopRightElement){
+        
+        if((Position == 'Left') || (Position == 'Right') )
+        {          
+        }
+
+
+        if(TopRightElement.clientWidth >= TopRightElement.clientHeight){      
+          NewParentView.Type = 'H';
+          NewParentView.Display = 'inline-flex';
+
+          TopRightView.Type = 'N';
+          TopRightView.HRatio = '50%';
+          TopRightView.VRatio = '100%';
+          TopRightView.Display = 'Block';
+          
+
+          V2.Type = 'N';
+          V2.HRatio = '50%';
+          V2.VRatio = '100%';
+          V2.Display = 'Block';          
+        } 
+        else{
+          NewParentView.Type = 'V';
+          NewParentView.Display = 'Block';
+
+          TopRightView.Type = 'N';
+          TopRightView.HRatio = '100%';
+          TopRightView.VRatio = '50%';
+          TopRightView.Display = 'Block';
+
+          V2.Type = 'N';
+          V2.HRatio = '100%';
+          V2.VRatio = '50%';
+          V2.Display = 'Block';    
+        }
+
+        TopRightView.PID = NewParentView.Index;
+        
+        V2.V1 = -1;
+        V2.V2 = -1;
+
+        NewParentView.V1 = TopRightView.Index;
+        NewParentView.V2 = V2.Index;
+
+        if(TopRightView.PID  >= 0){    
+          if(ParentView.V1 === TopRightView.Index){
+            ParentView.V1 = NewParentView.Index;
+          }else{
+            ParentView.V2 = NewParentView.Index;
+          }
+        }
+
+
+        $ViewList.push(NewParentView);   
+        $ViewList.push(V2);   
+
+        if(NewParentView.PID  >= 0){
+          $ViewList = $ViewList;
+        }else{
+          TopParentView = NewParentView;
+        }
+
+        //TopParentView = $ViewList[0];
+        
+        console.log($ViewList);
+        console.log(`Compelted Add TopRightWindow ${V2.Index}`);     
+      }
+      else{
+
+        console.log(`Failed Add TopRightWindow ${V2.Index}`);
+      }
+
+      console.log($ViewList);
+      console.log('----------------------------------------------');
+
+      console.log(`=======================================================`);
+      
+      
+      
     }
     function SpliteTopView(Index){
 
@@ -620,7 +755,11 @@
       </header>
       <div id="idContainer" class="divContainer">        
         {#if TopParentView}
-          <FlexibleView bind:View={TopParentView} {ViewList}  Total_Width="100%" Total_Height="100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteParent} />
+          <FlexibleView bind:View={TopParentView} {ViewList}  Total_Width="100%" Total_Height="100%" 
+                        on:RemoveChild={EventRemoveChild} 
+                        on:RemoveParent={EventRemoveParent} 
+                        on:SpliteChild={EventSpliteParent}
+                        on:EventChildDrop={EventChildDrop} />
         {/if}        
       </div>
     </div>

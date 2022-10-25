@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    import { ViewList, g_DragSourceElement, g_IsDropSafeZone, DragStartResult } from './stores.js'
+    import { DropInfo, g_DragSourceElement, g_IsDropSafeZone, DragStartResult } from './stores.js'
     import { onMount, beforeUpdate, afterUpdate, onDestroy } from 'svelte'
     
     export let Index = ''; 
@@ -12,7 +12,9 @@
     const dispatchRemove          = createEventDispatcher(); 
     const dispatchDialogDrag      = createEventDispatcher(); 
     const dispatchDialogDragStart = createEventDispatcher(); 
-    const dispatchDialogRollack   = createEventDispatcher(); 
+    const dispatchDialogRollack   = createEventDispatcher();
+    const dispatchDialogMove      = createEventDispatcher();
+    const dispatchDialogDrop      = createEventDispatcher();
 
     console.log('******************************')
     console.log(`BoxView:${Index}`)
@@ -129,9 +131,8 @@
 
         console.log(`eventDragStart::start`);
 
-        //event.dataTransfer.setData("text/plain", event.path[0].id);
-        //$g_IsDropSafeZone = false;    
-        //event.dataTransfer.setDragImage(cloneElement, 0, 0);
+        event.dataTransfer.setData("text/plain", Index);
+        //$g_IsDropSafeZone = false;            
 
         await dispatchDialogDragStart('DialogDragStart', new DragStartResult(Index, event));
         
@@ -160,7 +161,8 @@
     }
     function eventDragLeave(event)
     {
-        event.preventDefault();
+        event.preventDefault();        
+
         console.log(`eventDragLeave${this.id}`); 
         $g_DragSourceElement = null;
         g_PreviewType = 'none';
@@ -168,20 +170,37 @@
     function eventDrop(event)
     {
         event.preventDefault();
-        console.log(`eventDrop${this.id}`);
+
+        const Target = Index;
+        const Source = event.dataTransfer.getData("text/plain");
+
+        g_PreviewType = GetPreViewPosition(this.id, event.offsetX, event.offsetY);
+
+        $DropInfo.Source   = Source;
+        $DropInfo.Target   = Target;
+        $DropInfo.Position = g_PreviewType;
+
+        console.log(`eventDrop ${Source} -> ${Target} Pos: ${g_PreviewType}`);
+
         g_PreviewType = 'none';
-        $g_IsDropSafeZone = true;
+        $g_IsDropSafeZone = true;      
     }
     function eventDragEnd(event)
     {
         event.preventDefault();
         console.log(`eventDragEnd${this.id}`);
         g_PreviewType = 'none';
-        if($g_IsDropSafeZone == false)
+
+        dispatchDialogRollack('DialogRollback', Index);
+
+        if($g_IsDropSafeZone)
         {
-            dispatchDialogRollack('DialogRollback', Index);
+            $g_IsDropSafeZone = false;
+            dispatchDialogMove('DialogMove', Index);
+            dispatchDialogDrop('DialogDrop', Index);
         }
         $g_IsDropSafeZone = false;
+      
     }   
     function GetPreViewPosition(eleID, posX, posY)
     {    

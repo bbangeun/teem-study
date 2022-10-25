@@ -52,3 +52,11 @@ export  class  ViewBox{
   }
  }
 
+ export let DropInfo = writable({
+	Source:   0,
+	Target:   0,
+  Position: 'none'
+})
+
+ 
+

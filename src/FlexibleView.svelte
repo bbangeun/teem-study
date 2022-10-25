@@ -34,6 +34,10 @@
 
     const dispatchChildDragStart = createEventDispatcher();
     const dispatchChildRollback  = createEventDispatcher();
+    const dispatchChildMove      = createEventDispatcher();
+    const dispatchChildDrop      = createEventDispatcher();
+
+    
 
     
     console.log('----------------------------------------------');
@@ -250,7 +254,7 @@
             }
         }
 
-       c
+  
         Object.freeze(ParentView);
 
         for(let i = 0; i < $ViewList.length; i++)
@@ -466,8 +470,7 @@
         console.log('EventDragStart');
 
         //dispatchChildRemove('RemoveChild', event.detail);
-        
-        
+
         let MoveView;
 
         let MoveElement, ResizeElement;   
@@ -625,6 +628,43 @@
     const EventChildRollback  = event =>{        
         Rollback(event.detail.detail);
     }
+    const EventChildMove = event =>{
+
+        let cloneElement   = null;
+        let parentElement  = null;
+        let moveIndex = event.detail.detail;
+
+        console.log('====================================================');
+        console.log('EventChildMove');
+        console.log('====================================================');
+
+        /*
+        parentElement = document.getElementById(View.Index);
+        cloneElement  = document.getElementById('c'+moveIndex.toString());
+
+        if(parentElement){
+            parentElement.style.position = '';
+            parentElement.style.display  = View.Display;   
+        }else{        
+            console.log("parentElement is null");
+        }
+
+        if(cloneElement)
+        {
+            parentElement.removeChild(cloneElement);
+        }else{
+            console.log("cloneElement is null");
+        }      
+        console.log(moveIndex);
+        ChildMove(moveIndex);
+        */
+       ChildMove(moveIndex);
+        console.log('====================================================');
+    }
+    const EventChildDrop  = event =>{
+        console.log("******************************************");
+        dispatchChildDrop('EventChildDrop', event);
+    }
 
     const EventDialogDragStart = event  =>{
         dispatchChildDragStart('EventChildDragStart', event);
@@ -632,6 +672,13 @@
     const EventDialogRollback = event  =>{
         dispatchChildRollback('EventChildRollback', event);
     }
+    const EventDialogMove = event  =>{
+        dispatchChildMove('EventChildMove', event);
+    }
+    const EventDialogDrop = event  =>{
+        dispatchChildDrop('EventChildDrop', event);
+    }   
+
     function GetDragImageElement(sourceElement){
         
         let cloneElement = null;
@@ -646,7 +693,6 @@
 
         return cloneElement;
     }
-
     function HideDragView(dragIndex, event)
     {
         let cloneElement = null;
@@ -861,6 +907,95 @@
         console.log('RollBack End  ');
         console.log('==============================================');
     }
+    function ChildMove(removeIndex){
+        let RemovedView;
+        let PairView;
+        
+        let V1;
+        let V2;
+        
+        console.log(`Child::Remove [${removeIndex}] V1:${View.V1} V2:${View.V2}`);
+        
+        if( (View.V1 === removeIndex) || (View.V2 === removeIndex))
+        {   
+            console.log(`Child::Remove Start`);
+
+            RemovedView = GetViewFromList(removeIndex);
+
+            if(View.V1 === RemovedView.Index){
+                PairView = GetViewFromList(View.V2);
+            }else{
+                PairView = GetViewFromList(View.V1);
+            }
+
+            if(PairView.Type === 'N')
+            {
+                console.log(`Child::PairView Type == N`);
+
+                dispatchChildParent('RemoveParent', removeIndex);
+            }else
+            {
+                console.log(`Child::PairView Type != N`);
+                V1 = GetViewFromList(PairView.V1);
+                V2 = GetViewFromList(PairView.V2);
+
+                V1.PID = View.Index;
+                V2.PID = View.Index;
+
+                if(PairView.Type ==='H'){
+                    V1.VRatio = '100%';
+                    V2.VRatio = '100%';
+
+                }else{
+                    V1.HRatio = '100%';
+                    V2.HRatio = '100%';
+                }
+
+                View.Type = PairView.Type;
+                View.V1 = PairView.V1;
+                View.V2 = PairView.V2;
+                View.Display =  PairView.Display;                
+
+
+                for(let i =0; i<$ViewList.length; i++){
+                    if(RemovedView.Index === $ViewList[i].Index ){
+                        $ViewList.splice(i, 1);
+                        console.log(`Child::Removed1 [${RemovedView.Index}]`);  
+                        break;
+                    }
+                }
+
+                for(let i =0; i<$ViewList.length; i++){
+                    if(PairView.Index === $ViewList[i].Index ){
+                        $ViewList.splice(i, 1);
+                        console.log(`Child::Removed2 [${PairView.Index}]`);  
+                        break;
+                    }
+                }
+        
+                Object.freeze(RemovedView);
+                Object.freeze(PairView);
+                
+                for(let i = 0; i < $ViewList.length; i++)
+                {
+                    if(View.V1 === $ViewList[i].Index){            
+                    Child_V1 = $ViewList[i];
+                    console.log(`Set Complete V1 ${View.V1}`);                
+                    }
+
+                    if(View.V2 === $ViewList[i].Index){          
+                        Child_V2 = $ViewList[i];
+                        console.log(`Set Complete V2 ${View.V2}`);
+                    }
+                }
+
+                console.log($ViewList);
+            }    
+            
+            console.log(`Child::Remove End`);
+        }
+
+    }
     
     /*=======================================================================*/
     // Function end 
@@ -871,20 +1006,22 @@
             class="divCanvas" 
             style= "width: {Total_Width}; height:{Total_Height}; display:{View.Display}">              
             {#if      View.Type === 'H'}
-                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart} on:EventChildRollback={EventChildRollback} > </svelte:self> 
+                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "calc({Child_V1.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart} on:EventChildRollback={EventChildRollback} on:EventChildMove={EventChildMove} on:EventChildDrop={EventChildDrop} > </svelte:self> 
                 <div id = "R{View.Index}"  class = "divResize" style= "width: 6px; min-width: 6px; height:{Child_V1.VRatio}" draggable="true"  ></div>
-                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart} on:EventChildRollback={EventChildRollback}></svelte:self>    
+                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "calc({Child_V2.HRatio} - 3px)" Total_Height = "100%" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart} on:EventChildRollback={EventChildRollback} on:EventChildMove={EventChildMove} on:EventChildDrop={EventChildDrop}></svelte:self>    
             {:else if View.Type === 'V'}
-                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart} on:EventChildRollback={EventChildRollback}></svelte:self> 
+                <svelte:self bind:View={Child_V1} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V1.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart} on:EventChildRollback={EventChildRollback} on:EventChildMove={EventChildMove} on:EventChildDrop={EventChildDrop}></svelte:self> 
                 <div id = "R{View.Index}" class = "divResize" style= "width:{Child_V1.HRatio}  height:6px; min-height: 6px;" draggable="true" ></div>
-                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart} on:EventChildRollback={EventChildRollback}></svelte:self>     
+                <svelte:self bind:View={Child_V2} {ViewList} Total_Width = "100%" Total_Height = "calc({Child_V2.VRatio} - 3px)" on:RemoveChild={EventRemoveChild} on:RemoveParent={EventRemoveParent} on:SpliteChild={EventSpliteChild} on:SpliteParent={EventSpliteParent} on:EventDragStart={EventDragStart} on:EventDrop={EventDrop} on:EventDragEnd={EventDragEnd} on:EventChildDragStart={EventChildDragStart} on:EventChildRollback={EventChildRollback} on:EventChildMove={EventChildMove} on:EventChildDrop={EventChildDrop}></svelte:self>     
             {:else}
                 <!--<BoxView bind:Index ={View.Index} on:spliteClick={spliteButtonClick} on:removeClick={removeButtonClick} on:EventDialogDrag={EventDialogDrag} on:DialogDragStart={EventDialogDragStart}></BoxView> -->
                 <BoxView    bind:Index ={View.Index} 
                             on:spliteClick      = {spliteButtonClick} 
                             on:removeClick      = {removeButtonClick} 
                             on:DialogDragStart  = {EventDialogDragStart}
-                            on:DialogRollback   = {EventDialogRollback}>                         
+                            on:DialogRollback   = {EventDialogRollback}
+                            on:DialogMove       = {EventDialogMove}
+                            on:DialogDrop       = {EventDialogDrop}>                         
                 </BoxView>
 
  
