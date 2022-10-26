@@ -9,6 +9,7 @@
     import { ViewList , ViewBox, DropInfo } from './stores.js'
 
     import { apiData, drinkNames } from './stores.js';
+    import { getAllByRole } from '@testing-library/svelte'
 
     const API_LOAD_URL = "http://127.0.0.1:8887/pane/"      //"http://127.0.0.1:8887/pane/1"
     const API_SAVE_URL = "http://127.0.0.1:8887/pane"      //"http://127.0.0.1:8887/pane/1"
@@ -145,20 +146,23 @@
         let TopParentIndex = 0;
 
         let NewParentView = {};
-
+        console.log('----------------------------------------------');
+        console.log('onClickedAdd Start');
         console.log('----------------------------------------------');
         console.log($ViewList);        
         console.log('----------------------------------------------');
 
         TopParentIndex = GetTopParentIndex();
         TopRightIndex  = GetTopRightWindow(TopParentIndex);
-        TopRightView   = GetViewFromList(TopRightIndex);
+        TopRightView   = GetViewFromList(TopRightIndex);        
 
         if(TopRightView.PID  >= 0){       
           ParentView    = GetViewFromList(TopRightView.PID);
-        }       
+        }
 
-        LastIndex = $ViewList[($ViewList.length-1)].Index;   
+        //LastIndex = $ViewList[($ViewList.length-1)].Index;
+        
+        LastIndex = getLastIndex();
 
         TopRightElement = document.getElementById(TopRightView.Index);
 
@@ -266,6 +270,20 @@
 
       return ResultView;
     }
+    function getLastIndex(){
+    
+      let lastIndex = 0;
+
+      for(let i = 0; i < $ViewList.length; i++)
+      {
+        if($ViewList[i].Index > lastIndex)
+        {            
+            lastIndex = $ViewList[i].Index;
+        }   
+      }
+      return lastIndex;
+    }     
+    
     function GetTopParentIndex(){
       let ResultIndex;
 
@@ -389,6 +407,7 @@
       let TargetIndex = 0;
       let SourceIndex = 0;
       let TargetView = {};
+      let SoruceView = {};
       let TagetElement;
       let Position = 'none';
 
@@ -404,83 +423,108 @@
       TargetIndex   = $DropInfo.Target;
       SourceIndex   = $DropInfo.Source;
       Position      = $DropInfo.Position;
-      TargetView     = GetViewFromList(TopRightIndex);
+      TargetView     = GetViewFromList(TargetIndex);
+
+      console.log(TargetView);      
 
       if(TargetView.PID  >= 0){       
         ParentView    = GetViewFromList(TargetView.PID);
       }       
 
-      LastIndex = $ViewList[($ViewList.length-1)].Index;   
+      //LastIndex = $ViewList[($ViewList.length-1)].Index;
+      LastIndex = getLastIndex();
 
       TagetElement = document.getElementById(TargetView.Index);
 
       if(TargetView.PID  >= 0){      
-        NewParentView         =  new ViewBox(++LastIndex, TargetView.PID);
+        NewParentView =  new ViewBox(++LastIndex, TargetView.PID);
       }
       else{
-        NewParentView         =  new ViewBox(++LastIndex, -1);
+        NewParentView =  new ViewBox(++LastIndex, -1);
       }
       NewParentView.HRatio  =  TargetView.HRatio;
       NewParentView.VRatio  =  TargetView.VRatio;
 
-      V2 =  new ViewBox(SourceIndex, NewParentView.Index);
+      SoruceView =  new ViewBox(Number(SourceIndex), NewParentView.Index);
+      //SoruceView =  new ViewBox(4, NewParentView.Index);
 
-      if(TopRightElement){
+      console.log('===================================');
+      console.log('SoruceView');
+      console.log('===================================');
+      console.log(SoruceView);
+      console.log('===================================');
+
+      if(TagetElement){
         
-        if((Position == 'Left') || (Position == 'Right') )
+        if((Position == 'left') || (Position == 'right') || (Position == 'none') || (Position == '') )
         {          
-        }
-
-
-        if(TopRightElement.clientWidth >= TopRightElement.clientHeight){      
           NewParentView.Type = 'H';
           NewParentView.Display = 'inline-flex';
 
-          TopRightView.Type = 'N';
-          TopRightView.HRatio = '50%';
-          TopRightView.VRatio = '100%';
-          TopRightView.Display = 'Block';
-          
+          TargetView.Type = 'N';
+          TargetView.HRatio = '50%';
+          TargetView.VRatio = '100%';
+          TargetView.Display = 'Block';
 
-          V2.Type = 'N';
-          V2.HRatio = '50%';
-          V2.VRatio = '100%';
-          V2.Display = 'Block';          
-        } 
-        else{
+          SoruceView.Type = 'N';
+          SoruceView.HRatio = '50%';
+          SoruceView.VRatio = '100%';
+          SoruceView.Display = 'Block';     
+
+          if(Position == 'left')
+          {
+            NewParentView.V1 = SoruceView.Index;
+            NewParentView.V2 = TargetView.Index;
+          }
+          else
+          {
+            NewParentView.V1 = TargetView.Index;
+            NewParentView.V2 = SoruceView.Index;
+          }
+          
+        }
+        else if( (Position == "top") || (Position == "bottom"))
+        {
           NewParentView.Type = 'V';
           NewParentView.Display = 'Block';
 
-          TopRightView.Type = 'N';
-          TopRightView.HRatio = '100%';
-          TopRightView.VRatio = '50%';
-          TopRightView.Display = 'Block';
+          TargetView.Type = 'N';
+          TargetView.HRatio = '100%';
+          TargetView.VRatio = '50%';
+          TargetView.Display = 'Block';
 
-          V2.Type = 'N';
-          V2.HRatio = '100%';
-          V2.VRatio = '50%';
-          V2.Display = 'Block';    
+          SoruceView.Type = 'N';
+          SoruceView.HRatio = '100%';
+          SoruceView.VRatio = '50%';
+          SoruceView.Display = 'Block';
+          
+          if(Position == 'top')
+          {
+            NewParentView.V1 = SoruceView.Index;
+            NewParentView.V2 = TargetView.Index;
+          }
+          else
+          {
+            NewParentView.V1 = TargetView.Index;
+            NewParentView.V2 = SoruceView.Index;
+          }
         }
 
-        TopRightView.PID = NewParentView.Index;
+        TargetView.PID = NewParentView.Index;
         
-        V2.V1 = -1;
-        V2.V2 = -1;
+        SoruceView.V1 = -1;
+        SoruceView.V2 = -1;
 
-        NewParentView.V1 = TopRightView.Index;
-        NewParentView.V2 = V2.Index;
-
-        if(TopRightView.PID  >= 0){    
-          if(ParentView.V1 === TopRightView.Index){
+        if(TargetView.PID  >= 0){    
+          if(ParentView.V1 === TargetView.Index){
             ParentView.V1 = NewParentView.Index;
           }else{
             ParentView.V2 = NewParentView.Index;
           }
         }
 
-
         $ViewList.push(NewParentView);   
-        $ViewList.push(V2);   
+        $ViewList.push(SoruceView);   
 
         if(NewParentView.PID  >= 0){
           $ViewList = $ViewList;
@@ -500,11 +544,7 @@
 
       console.log($ViewList);
       console.log('----------------------------------------------');
-
-      console.log(`=======================================================`);
-      
-      
-      
+      console.log(`=======================================================`);      
     }
     function SpliteTopView(Index){
 

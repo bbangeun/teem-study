@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    import { DropInfo, g_DragSourceElement, g_IsDropSafeZone, DragStartResult } from './stores.js'
+    import { ViewList, DropInfo, g_DragSourceElement, g_IsDropSafeZone, DragStartResult } from './stores.js'
     import { onMount, beforeUpdate, afterUpdate, onDestroy } from 'svelte'
     
     export let Index = ''; 
@@ -200,6 +200,12 @@
             dispatchDialogDrop('DialogDrop', Index);
         }
         $g_IsDropSafeZone = false;
+
+        console.log('==========================================');
+        console.log('eventDragEnd');
+        console.log('==========================================');
+        console.log($ViewList);
+        console.log('==========================================');
       
     }   
     function GetPreViewPosition(eleID, posX, posY)
@@ -277,7 +283,7 @@
                 else
                 {
                     console.log('Position:none');                    
-                    result = '';                   
+                    result = 'none';                   
                 }              
             }
             else

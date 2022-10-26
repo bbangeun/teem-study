@@ -377,6 +377,7 @@
         let LastIndex = 0;   
         let SpliteViewElement;
 
+        console.log(`(*************************************************)`); 
         console.log(`TopParent::Splite Start [${Index}]`); 
 
         SpliteView = GetViewFromList(Index);

@@ -254,7 +254,6 @@
             }
         }
 
-  
         Object.freeze(ParentView);
 
         for(let i = 0; i < $ViewList.length; i++)
@@ -372,14 +371,19 @@
         let New_ParentView;
         let New_V2;
         let LastIndex = 0;   
-        let SpliteViewElement;
+        let SpliteViewElement;        
 
         console.log(`Child::Splite Start [${Index}] V:${View.Index} V1:${View.V1} V2:${View.V2}`); 
 
         SpliteView = GetViewFromList(Index);
         ParentView = GetViewFromList(SpliteView.PID);
 
-        LastIndex = $ViewList[($ViewList.length-1)].Index;  
+        //LastIndex = $ViewList[($ViewList.length-1)].Index;
+        LastIndex = getLastIndex();  
+
+        console.log('LastIndex');
+        console.log(LastIndex);        
+
 
         New_ParentView =  new ViewBox(++LastIndex, SpliteView.PID);
         New_ParentView.Title = New_ParentView.Index.toString();
@@ -435,9 +439,9 @@
 
         $ViewList.push(New_ParentView);   
         $ViewList.push(New_V2);
-
-        //$ViewList = $ViewList;
-
+      
+        //$ViewList = $ViewList; 
+       
         for(let i = 0; i < $ViewList.length; i++)
         {
             if(View.V1 === $ViewList[i].Index){            
@@ -452,6 +456,7 @@
                 console.log(`Set Complete V2 ${View.V2}`);
             }
         }
+       
 
         console.log($ViewList);
         console.log(`Child::Splite End [${Index}] V:${View.Index} V1:${View.V1} V2:${View.V2}`);
@@ -461,7 +466,7 @@
     }    
     const spliteButtonClick = event => {       
         console.log(`spliteButtonClick ${event.detail}`);
-        console.log(View);
+        console.log(View);        
         
         dispatchSpliteChild('SpliteChild', event.detail);
     }  
@@ -996,6 +1001,20 @@
         }
 
     }
+
+    function getLastIndex(){
+
+        let lastIndex = 0;
+
+        for(let i = 0; i < $ViewList.length; i++)
+        {
+        if($ViewList[i].Index > lastIndex)
+        {            
+            lastIndex = $ViewList[i].Index;
+        }   
+        }
+        return lastIndex;
+    } 
     
     /*=======================================================================*/
     // Function end 

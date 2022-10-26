@@ -229,7 +229,6 @@
         
 
         let V1_Height, V2_Height;
-
      
 
         ParentElement = document.getElementById(View.Index);   
@@ -496,12 +495,18 @@
         let LastIndex = 0;   
         let SpliteViewElement;
 
+        console.log('============================================');
         console.log(`Child::Splite Start [${Index}] V:${View.Index} V1:${View.V1} V2:${View.V2}`); 
+        console.log('============================================');
 
         SpliteView = GetViewFromList(Index);
         ParentView = GetViewFromList(SpliteView.PID);
 
-        LastIndex = $ViewList[($ViewList.length-1)].Index;  
+        //LastIndex = $ViewList[($ViewList.length-1)].Index;
+        LastIndex = getLastIndex();   
+        
+        //console.log('LastIndex');
+        //console.log(LastIndex);
 
         New_ParentView =  new ViewBox(++LastIndex, SpliteView.PID);
         New_ParentView.Title = New_ParentView.Index.toString();
@@ -584,6 +589,8 @@
     const spliteButtonClick = event => {       
         console.log(`spliteButtonClick ${event.detail}`);
         console.log(View);
+      
+
         
         dispatchSpliteChild('SpliteChild', event.detail);
     } 
